@@ -1,0 +1,43 @@
+# The config of the ZombieApocalypse plugin
+# Created by 3ricL, minecraft name: Ericdebouwer
+# -
+# Edit this configuration with care, and NEVER use tabs!
+# If this configuration breaks, my plugin will try to explain what should be changed/fixed
+# to reset it, simply remove it from the "ZombieApocalypse" folder and it will generate a new one
+# -
+# You can sometimes pass arguments between curly braces,
+# so {world_name} is replaced with the actual world's name for example
+# Not including the argument will work just fine, but might be less helpful to users
+# You can use color codes by using the §-symbol, as seen on: https://www.digminecraft.com/lists/color_list_pc.php
+###################################################################
+
+version: 1.0
+
+plugin-prefix: "§7<<§4Zombie§2Apocalypse§7>>§r "
+
+apocalypse-worlds: []
+
+messages:
+   no-command-permission: "§4§lSorry§r§7, you don't have permission for that!"
+   
+   started-success: "§aApocalyse succesfully started in '{world_name}'!"
+   started-broadcast: "§dThe zombie apocalyse has just started!"
+   start-failed: "§cApocalypse has already started in '{world_name}'"
+   
+   ended-success: "§aApocalypse ended in world: '{world_name}'!"
+   end-failed: "§cThere is no apocalypse in '{world_name}'" 
+   ended-broadcast: "§dThe zombie apocalyse has ended in this world, you are safe (for now)!"
+   
+   invalid-world: "§cWorld '{world_name}' doesn't exist"
+   
+   apocalypse-boss-bar-title: "§5Zombie apocalypse ongoing!"
+   
+   given-zombie-egg: "§7You have been given a §r§6{item_name}"
+   invalid-egg-type: "§cThat zombie type doesn't exist!"
+  
+   
+   
+   
+
+
+
