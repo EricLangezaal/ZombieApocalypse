@@ -53,10 +53,10 @@ public class ZombieEvents implements Listener{
 		zombie = ZombieType.set(zombie, type);
 		
 		if (type == ZombieType.SPRINTER){
-			// gwn heel snel
+			// very fast
 			zombie.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.45);
 		}else if (type == ZombieType.TANK){	
-			//langzaam, veel sterker en meer levens
+			//slow, stronger, more damage
 			zombie.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(40.0); 
 			zombie.setHealth(40.0);
 			zombie.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(3);
@@ -64,7 +64,7 @@ public class ZombieEvents implements Listener{
 			zombie.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(10.0);
 		}
 		else if (type == ZombieType.NINJA){
-			// sterker, sneller, minder levens
+			// more damage, faster, less health
 			zombie.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.4);
 			zombie.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(10.0);
 			zombie.setHealth(10.0);
@@ -106,7 +106,7 @@ public class ZombieEvents implements Listener{
 					Vector newSpeed = e.getDamager().getLocation().getDirection().multiply(1.5).setY(1.5);
 					e.getEntity().setVelocity(newSpeed);
 				}
-		     }.runTask(plugin);
+			}.runTask(plugin);
 		}
 	}
 	
