@@ -72,12 +72,12 @@ public class ConfigurationManager {
 	
 	private boolean validateSection(String template_path, String real_path, boolean deep){
 		InputStream templateFile = getClass().getClassLoader().getResourceAsStream("config.yml");
-        FileConfiguration templateConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(templateFile));
+                FileConfiguration templateConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(templateFile));
         
-        ConfigurationSection real_section = plugin.getConfig().getConfigurationSection(real_path);
-        ConfigurationSection template_section = templateConfig.getConfigurationSection(template_path);
+                ConfigurationSection real_section = plugin.getConfig().getConfigurationSection(real_path);
+                ConfigurationSection template_section = templateConfig.getConfigurationSection(template_path);
         
-        if (real_section == null || template_section == null) return false;
+                if (real_section == null || template_section == null) return false;
         
  		for(String key: template_section.getKeys(deep)){
  			if (!real_section.getKeys(deep).contains(key) || template_section.get(key).getClass() != real_section.get(key).getClass()){
