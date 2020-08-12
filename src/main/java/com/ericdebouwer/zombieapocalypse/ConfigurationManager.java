@@ -91,7 +91,6 @@ public class ConfigurationManager {
 	public void saveApocalypseWorlds(ArrayList<String> worldNames){
 		plugin.reloadConfig();
 		plugin.getConfig().set(APOCALYPSE_WORLDS, worldNames);
-		//plugin.getConfig().options().copyHeader(false);
 		plugin.saveConfig();
 	}
 	

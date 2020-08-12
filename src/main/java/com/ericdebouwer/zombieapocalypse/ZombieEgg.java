@@ -4,9 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import net.md_5.bungee.api.ChatColor;
-
 import org.apache.commons.lang.WordUtils;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -56,7 +55,6 @@ public class ZombieEgg implements Listener, CommandExecutor, TabCompleter{
 				String itemName = WordUtils.capitalizeFully(type.toString()) + " Zombie Egg";
 				meta.setDisplayName(ChatColor.RESET + itemName);
 				zombieEgg.setItemMeta(meta);
-				
 				player.getInventory().addItem(zombieEgg);
 				plugin.getConfigManager().sendMessage(player, Message.EGG_GIVEN, ImmutableMap.of("item_name", itemName));
 				

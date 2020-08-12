@@ -16,6 +16,8 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -43,13 +45,7 @@ public class ZombieEvents implements Listener{
 	}
 	
 	public Zombie spawnZombie(Location loc, ZombieType type){
-		Zombie zombie;
-		if (loc.getWorld().getEnvironment() == Environment.NETHER){
-			zombie = (Zombie) loc.getWorld().spawnEntity(loc, EntityType.PIG_ZOMBIE);
-		}
-		else {
-			zombie = (Zombie) loc.getWorld().spawnEntity(loc, EntityType.ZOMBIE);
-		}
+		Zombie zombie = this.spawnForEnvironment(loc);
 		zombie = ZombieType.set(zombie, type);
 		
 		if (type == ZombieType.SPRINTER){
@@ -69,6 +65,32 @@ public class ZombieEvents implements Listener{
 			zombie.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(10.0);
 			zombie.setHealth(10.0);
 			zombie.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(6.0);
+		}
+		else if (type == ZombieType.JUMPER){
+			// type, duration, amplifier, extra particles , particles, icon in player inv
+			zombie.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, 5, false, false, false));
+		}
+		else if (type == ZombieType.PILLAR){
+			zombie.setBaby(false);
+			int passengers = ThreadLocalRandom.current().nextInt(4) + 1; // [1-4], dus 2-5 hoog
+			Zombie lowerZombie = zombie;
+			for (int i = 1; i <= passengers; i++){
+				Zombie newZombie = this.spawnForEnvironment(loc.clone().add(0, 1.5 * i, 0));
+				newZombie.setBaby(false);
+				lowerZombie.addPassenger(newZombie);
+				lowerZombie = newZombie;
+			}
+		}
+		return zombie;
+	}
+	
+	public Zombie spawnForEnvironment(Location loc){
+		Zombie zombie;
+		if (loc.getWorld().getEnvironment() == Environment.NETHER){
+			zombie = (Zombie) loc.getWorld().spawnEntity(loc, EntityType.PIG_ZOMBIE);
+		}
+		else {
+			zombie = (Zombie) loc.getWorld().spawnEntity(loc, EntityType.ZOMBIE);
 		}
 		return zombie;
 	}

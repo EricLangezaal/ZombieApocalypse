@@ -64,7 +64,7 @@ public class ApocalypseCommand implements CommandExecutor, TabCompleter {
 				return true;	
 			}
 		}
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 

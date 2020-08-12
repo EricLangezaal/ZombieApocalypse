@@ -9,7 +9,9 @@ public enum ZombieType{
 	THROWER,
 	TANK,
 	NINJA,
-	MULTIPLIER;
+	MULTIPLIER,
+	JUMPER,
+	PILLAR;
 	
 	private final static String ZOMBIE_INDENTIFIER = "ApocalypseZombieType";
 	
