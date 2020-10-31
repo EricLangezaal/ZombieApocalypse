@@ -3,11 +3,11 @@ main: com.ericdebouwer.zombieapocalypse.ZombieApocalypse
 author: ericdebouwer (3ricL)
 description: Add a zombie apocalypse to minecraft!
 api-version: 1.13
-version: 1.1
+version: 1.2
 commands:
    apocalypse:
        aliases: [apo]
-       usage: "§6USAGE §r/<command> <start | end> §7[worldname]"
+       usage: "§6USAGE §r/<command> <start | end> §7[worldname] [duration]"
    zombie:
        usage: "§6USAGE §r/<command> <zombie_type>"
        

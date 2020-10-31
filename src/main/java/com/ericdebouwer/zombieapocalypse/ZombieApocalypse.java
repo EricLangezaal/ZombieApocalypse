@@ -7,6 +7,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class ZombieApocalypse extends JavaPlugin {
+	
 
 	private ZombieEvents zombieEvents;
 	private ApocalypseManager apoManager;
@@ -21,6 +22,7 @@ public class ZombieApocalypse extends JavaPlugin {
 			return;
 		}
 		getServer().getConsoleSender().sendMessage(configManager.logPrefix +"Configuration has been successfully loaded!");
+		getServer().getConsoleSender().sendMessage(configManager.logPrefix +"If you really love this project, you could consider donating to help me keep this project alive! https://paypal.me/3ricL");
 		ApocalypseCommand apoCommand = new ApocalypseCommand(this);
 		this.getCommand("apocalypse").setExecutor(apoCommand);
 		this.getCommand("apocalypse").setTabCompleter(apoCommand);
@@ -40,7 +42,7 @@ public class ZombieApocalypse extends JavaPlugin {
 	
 	@Override
 	public void onDisable(){
-		apoManager.save();
+		apoManager.onDisable();
 	}
 	
 	public ZombieEvents getZombieManager(){

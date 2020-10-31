@@ -59,7 +59,7 @@ public class ZombieEgg implements Listener, CommandExecutor, TabCompleter{
 				plugin.getConfigManager().sendMessage(player, Message.EGG_GIVEN, ImmutableMap.of("item_name", itemName));
 				
 			}catch (IllegalArgumentException e){
-				plugin.getConfigManager().sendMessage(player, Message.INVALID_ZOMBIE, null);
+				plugin.getConfigManager().sendMessage(player, Message.INVALID_ZOMBIE, ImmutableMap.of("input", args[0]));
 			}
 			return true;
 		}

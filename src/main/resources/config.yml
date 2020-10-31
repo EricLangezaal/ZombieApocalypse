@@ -11,28 +11,70 @@
 # You can use color codes by using the §-symbol, as seen on: https://www.digminecraft.com/lists/color_list_pc.php
 ###################################################################
 
-version: 1.0
+version: 1.2
 
+# This is shown before all messages this plugin sends in chat
 plugin-prefix: "§7<<§4Zombie§2Apocalypse§7>>§r "
 
-apocalypse-worlds: []
+# Settings for the different types of zombies.
+# To stop a zombie from spawning, simply remove it from this list! (You can still get a spawn egg from it, but it won't have the custom head)
+# 
+# You can specify a texture url for a Minecraft skin, whose head will be put on the zombie to mark them as special
+# - To find these URls, take a look at https://minecraft-heads.com/custom-heads
+# - Once you find a head you like, scroll all the way down to "Other". Grab the blue link that starts with 'http://textures.minecraft.net/..."
+#
+# To give them a default head, simply use "" for the head texture url!
+zombies:
+   DEFAULT: 
+      head: ""
+   SPRINTER:
+      head: "http://textures.minecraft.net/texture/608d83a505cb9220db26e0ce87187c7b46dcc7b1d171ec23752bab0f7a87e2e7"
+   BOOMER:
+      head: "http://textures.minecraft.net/texture/3ec33735f71e2b7756d7cfafcf5cb0a9cd357d4174a47c5f073c1134902cf4d"
+   THROWER:
+      head: "http://textures.minecraft.net/texture/4fd55a13b973d6d4cc5badda11c8a0436470b601a9883b91c4b59c48c9a76aab"
+   TANK:
+      head: "http://textures.minecraft.net/texture/65e97ef120d94e916d196fc65c141a31c20540b083daf86a00b201885b4ef49c"
+   NINJA:
+      head: "http://textures.minecraft.net/texture/b72fdeb1274cba67316b206c9f77438964c90971af996c35be2395f6477469b"
+   MULTIPLIER:
+      head: "http://textures.minecraft.net/texture/bf938ae03138b2d022d6280858fc67e2612086e8112f9d1546764561978425b1"
+   JUMPER:
+      head: "http://textures.minecraft.net/texture/a20e84d32d1e9c919d3fdbb53f2b37ba274c121c57b2810e5a472f40dacf004f"
+   PILLAR:
+      head: ""
+    
+# whether or not some of the zombies can spawn as babies, like zombies normally do
+allow-babies: true
 
 messages:
    no-command-permission: "§4§lSorry§r§7, you don't have permission for that!"
-   
+
+   # started-success supports placeholder {world_name}
    started-success: "§aApocalyse succesfully started in '{world_name}'!"
+   # started-broadcast supports placeholder {world_name}
    started-broadcast: "§dThe zombie apocalyse has just started!"
+   # started-failed supports placeholder {world_name}
    start-failed: "§cApocalypse has already started in '{world_name}'"
-   
+   # started-failed supports placeholder {input}, for the users faulty duration input
+   start-invalid-duration: "§cThe minutes the apocalypse should last for must be an integer!"
+
+   # ended-success supports placeholder {world_name}
    ended-success: "§aApocalypse ended in world: '{world_name}'!"
+   # ended-failed supports placeholder {world_name}
    end-failed: "§cThere is no apocalypse in '{world_name}'" 
+   # ended-broadcast supports placeholder {world_name}
    ended-broadcast: "§dThe zombie apocalyse has ended in this world, you are safe (for now)!"
-   
+
+   # invalid-world supports placeholder {world_name}
    invalid-world: "§cWorld '{world_name}' doesn't exist"
-   
+
+   # The text that will show up in the bar on the top of the screen in apocalyptic worlds
    apocalypse-boss-bar-title: "§5Zombie apocalypse ongoing!"
-   
+
+   # given-zombie-egg supports placeholder {item_name} for the name of the egg just received
    given-zombie-egg: "§7You have been given a §r§6{item_name}"
+   # invalid-egg-type supports placeholder {input} for the users faulty zombie type input
    invalid-egg-type: "§cThat zombie type doesn't exist!"
   
    

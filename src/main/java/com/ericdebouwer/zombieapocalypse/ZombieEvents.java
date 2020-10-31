@@ -1,9 +1,12 @@
 package com.ericdebouwer.zombieapocalypse;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World.Environment;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.EntityType;
@@ -16,6 +19,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -40,13 +44,25 @@ public class ZombieEvents implements Listener{
 	}
 	
 	public Zombie spawnZombie(Location loc){
-		ZombieType randomType = ZombieType.values()[ThreadLocalRandom.current().nextInt(ZombieType.values().length)];
+		List<ZombieType> types = plugin.getConfigManager().getZombieTypes();
+		if (types.isEmpty()) types = Arrays.asList(ZombieType.values());
+		ZombieType randomType = types.get(ThreadLocalRandom.current().nextInt(types.size()));
 		return this.spawnZombie(loc, randomType);
 	}
 	
 	public Zombie spawnZombie(Location loc, ZombieType type){
 		Zombie zombie = this.spawnForEnvironment(loc);
 		zombie = ZombieType.set(zombie, type);
+		if (zombie.getVehicle() != null){
+			zombie.getVehicle().remove();
+		}
+		
+		ItemStack head = plugin.getConfigManager().getHead(type);
+		if (head != null)
+			zombie.getEquipment().setHelmet(head);
+		
+		if (!plugin.getConfigManager().doBabies)
+			zombie.setBaby(false);
 		
 		if (type == ZombieType.SPRINTER){
 			// very fast
@@ -72,10 +88,10 @@ public class ZombieEvents implements Listener{
 		}
 		else if (type == ZombieType.PILLAR){
 			zombie.setBaby(false);
-			int passengers = ThreadLocalRandom.current().nextInt(4) + 1; // [1-4], dus 2-5 hoog
+			int passengers = ThreadLocalRandom.current().nextInt(4) + 1; // [1-4], so 2-5 high
 			Zombie lowerZombie = zombie;
 			for (int i = 1; i <= passengers; i++){
-				Zombie newZombie = this.spawnForEnvironment(loc.clone().add(0, 1.5 * i, 0));
+				Zombie newZombie = this.spawnZombie(loc.add(0, 1.5, 0), ZombieType.DEFAULT);
 				newZombie.setBaby(false);
 				lowerZombie.addPassenger(newZombie);
 				lowerZombie = newZombie;
@@ -130,6 +146,14 @@ public class ZombieEvents implements Listener{
 				}
 			}.runTask(plugin);
 		}
+	}
+	
+	@EventHandler
+	public void zombieDead(EntityDeathEvent e){
+		if (!(e.getEntity() instanceof Zombie)) return;
+		List<ItemStack> newDrops = e.getDrops().stream().filter(i -> i.getType() != Material.PLAYER_HEAD).collect(Collectors.toList());
+		e.getDrops().clear();
+		e.getDrops().addAll(newDrops);
 	}
 	
 	
