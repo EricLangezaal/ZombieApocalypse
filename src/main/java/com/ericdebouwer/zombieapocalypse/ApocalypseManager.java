@@ -141,6 +141,7 @@ public class ApocalypseManager implements Listener {
 		if (!isApocalypse(worldName)) return false;
 		apocalypseWorlds.remove(worldName);
 		apoEnders.remove(worldName);
+		apoConfig.set(worldName, null);
 		
 		World world = Bukkit.getWorld(worldName);
 		if (world == null) return true;
