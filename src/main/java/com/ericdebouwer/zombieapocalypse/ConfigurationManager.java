@@ -17,10 +17,10 @@ import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
@@ -28,59 +28,62 @@ import com.google.common.collect.ImmutableMap;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
-enum Message {
-	START_SUCCESS("started-success"),START_BROADCAST ("started-broadcast"),START_FAIL ("start-failed"), START_INVALID_INT("start-invalid-duration"),
-	END_SUCCESS ("ended-success"),END_FAIL ("end-failed"),END_BROADCAST ("ended-broadcast"),
-	INVALID_WORLD ("invalid-world"), NO_PERMISSION ("no-command-permission"),
-	EGG_GIVEN ("given-zombie-egg"), INVALID_ZOMBIE ("invalid-egg-type"), BOSS_BAR_TITLE ("apocalypse-boss-bar-title");
-	
-	String key;
-	Message(String key){
-		this.key = key;
-	}
-	public String getKey(){ return this.key;}
-}
-
 public class ConfigurationManager {
 
 	ZombieApocalypse plugin;
 	private final String MESSAGES_PREFIX = "messages.";
 	private final String ZOMBIES_PREFIX = "zombies.";
-	public String logPrefix;
+	
 	public String pluginPrefix;
 	public boolean doBabies = true;
 	private boolean isValid = true;
 	
 	private Map<ZombieType, String> zombieTypes = new HashMap<>();
+	private Map<ZombieType, ItemStack> heads = new HashMap<>(); //cache them to prevent needless reflection
 	
 	public ConfigurationManager(ZombieApocalypse plugin){
 		this.plugin = plugin;
 		plugin.saveDefaultConfig();
-
-		this.logPrefix = "[" + this.plugin.getName() + "] ";
 		
-		this.isValid = this.validateConfig();
-		if (!this.isValid){
-			if (!handleUpdate()){
-				Bukkit.getLogger().log(Level.INFO,ChatColor.RED +  this.logPrefix + "Automatic configuration update failed! Please delete the old 'config.yml' to get a new one.");
-			}else {
-				Bukkit.getLogger().log(Level.INFO, this.logPrefix + "================================================================");
-	        	Bukkit.getLogger().log(Level.INFO, this.logPrefix + "Automatically updated old configuration file!");
-	        	Bukkit.getLogger().log(Level.INFO, this.logPrefix + "================================================================");
-	        	plugin.reloadConfig();
-	        	this.isValid = true;
-			}
-		}
-		
-		if (isValid){
-			pluginPrefix = plugin.getConfig().getString("plugin-prefix");
-			doBabies = plugin.getConfig().getBoolean("allow-babies");
-			this.loadZombies();
-		}
+		this.isValid = this.checkConfig();
+		if (isValid) this.loadConfig();
 	}
 	
 	public boolean isValid(){
 		return this.isValid;
+	}
+	
+	private boolean checkConfig(){
+		boolean valid = this.validateConfig(true);
+		if (!valid){
+			if (handleUpdate()){
+				plugin.reloadConfig();
+				if (validateConfig(false)) {
+					Bukkit.getLogger().log(Level.INFO, plugin.logPrefix + "================================================================");
+		        	Bukkit.getLogger().log(Level.INFO, plugin.logPrefix + "Automatically updated old/invalid configuration file!");
+		        	Bukkit.getLogger().log(Level.INFO, plugin.logPrefix + "================================================================");
+		        	return true;
+				}
+			}
+			Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.RED +  plugin.logPrefix + "Automatic configuration update failed! You can delete the old 'config.yml' to get a new one.");
+		}
+		return valid;
+	}
+	
+	public void loadConfig(){
+		pluginPrefix = plugin.getConfig().getString("plugin-prefix");
+		doBabies = plugin.getConfig().getBoolean("allow-babies");
+		
+		ConfigurationSection section = plugin.getConfig().getConfigurationSection(ZOMBIES_PREFIX);
+		for (String zombie: section.getKeys(false)){
+			String headUrl = section.getString(zombie + ".head", "");
+			try {
+				ZombieType type = ZombieType.valueOf(zombie.toUpperCase());
+				zombieTypes.put(type, headUrl);
+			} catch (IllegalArgumentException e){
+				Bukkit.getConsoleSender().sendMessage(ChatColor.BOLD + "" +ChatColor.RED + plugin.logPrefix +"Zombie type '" + zombie + "' doesn't exist and isn't loaded in.");
+			}
+		}
 	}
 	
 	public String getString(Message m){
@@ -88,7 +91,7 @@ public class ConfigurationManager {
 		return msg == null ? "" : msg;
 	}
 	
-	public void sendMessage(Player p, Message message, ImmutableMap<String, String> replacements){
+	public void sendMessage(CommandSender p, Message message, ImmutableMap<String, String> replacements){
 		String msg = getString(message);
 		if (msg.isEmpty()) return;
 		String colorMsg = ChatColor.translateAlternateColorCodes('§', this.pluginPrefix + msg);
@@ -100,13 +103,13 @@ public class ConfigurationManager {
 		p.sendMessage(colorMsg);		
 	}
 	
-	private boolean validateConfig(){
-		if (!this.validateSection("", "", false)) return false;
-		if (!this.validateSection(MESSAGES_PREFIX, MESSAGES_PREFIX, false)) return false;
+	private boolean validateConfig(boolean log){
+		if (!this.validateSection("", "", false, log)) return false;
+		if (!this.validateSection(MESSAGES_PREFIX, MESSAGES_PREFIX, false, log)) return false;
 		return true;
 	}
 	
-	private boolean validateSection(String template_path, String real_path, boolean deep){
+	private boolean validateSection(String template_path, String real_path, boolean deep, boolean log){
 		InputStream templateFile = getClass().getClassLoader().getResourceAsStream("config.yml");
                 FileConfiguration templateConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(templateFile));
         
@@ -117,7 +120,7 @@ public class ConfigurationManager {
         
  		for(String key: template_section.getKeys(deep)){
  			if (!real_section.getKeys(deep).contains(key) || template_section.get(key).getClass() != real_section.get(key).getClass()){
- 				Bukkit.getLogger().log(Level.WARNING, this.logPrefix + "Missing or invalid datatype key '" + key + "' and possibly others in config.yml");
+ 				if (log) Bukkit.getLogger().log(Level.WARNING, plugin.logPrefix + "Missing or invalid datatype key '" + key + "' and possibly others in config.yml");
  				return false;
  			}
  		}
@@ -127,31 +130,27 @@ public class ConfigurationManager {
 	public boolean handleUpdate(){
 		File oldConfig = new File(plugin.getDataFolder(), "config.yml");
 		try {
-			ConfigUpdater.update(plugin, "config.yml", oldConfig, Arrays.asList("apocalypse-worlds"));
+			ConfigUpdater.update(plugin, "config.yml", oldConfig, Arrays.asList("apocalypse-worlds", "version"));
 		} catch (IOException e){
 			return false;
 		}
 		return true;
 	}
 	
-	public void loadZombies(){
-		ConfigurationSection section = plugin.getConfig().getConfigurationSection(ZOMBIES_PREFIX);
-		for (String zombie: section.getKeys(false)){
-			String headUrl = section.getString(zombie + ".head", "");
-			try {
-				ZombieType type = ZombieType.valueOf(zombie.toUpperCase());
-				zombieTypes.put(type, headUrl);
-			} catch (IllegalArgumentException e){
-				Bukkit.getConsoleSender().sendMessage(ChatColor.BOLD + "" +ChatColor.RED + this.logPrefix +"Zombie type '" + zombie + "' doesn't exist and isn't loaded in.");
-			}
-		}
+	public void reloadConfig(){
+		plugin.reloadConfig();
+		this.isValid = this.checkConfig();
+		if (isValid) this.loadConfig();
 	}
-	
+
 	public List<ZombieType> getZombieTypes(){
 		return new ArrayList<>(zombieTypes.keySet());
 	}
 	
 	public ItemStack getHead(ZombieType type){
+		ItemStack savedHead = heads.get(type);
+		if (savedHead != null) return savedHead;
+		
 		String textureUrl = zombieTypes.get(type);
 		if (textureUrl == null || textureUrl.isEmpty()) return null;
 		
@@ -167,10 +166,11 @@ public class ConfigurationManager {
             profileField.setAccessible(true);
             profileField.set(headMeta, profile);
         } catch (NoSuchFieldException | IllegalArgumentException | IllegalAccessException e1) {
-        	Bukkit.getLogger().log(Level.INFO,  this.logPrefix + "Zombie head could not be set, is the minecraft version correct?");
+        	Bukkit.getLogger().log(Level.INFO,  plugin.logPrefix + "Zombie head could not be set, is the minecraft version correct?");
         }
         
         head.setItemMeta(headMeta);
+        heads.put(type, head);
         return head;
 	}
 

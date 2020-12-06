@@ -11,8 +11,6 @@
 # You can use color codes by using the §-symbol, as seen on: https://www.digminecraft.com/lists/color_list_pc.php
 ###################################################################
 
-version: 1.2
-
 # This is shown before all messages this plugin sends in chat
 plugin-prefix: "§7<<§4Zombie§2Apocalypse§7>>§r "
 
@@ -65,9 +63,23 @@ messages:
    end-failed: "§cThere is no apocalypse in '{world_name}'" 
    # ended-broadcast supports placeholder {world_name}
    ended-broadcast: "§dThe zombie apocalyse has ended in this world, you are safe (for now)!"
+   
+   reload-success: "§aThe plugin has been successfully reloaded!"
+   reload-fail: "§cReloading the configuration failed! See the console for more details."
+   
+   mobcap-too-few-arguments: "§cPlease also provide the name of the world and the desired mobcap!"
+   # supports placeholder {input} for the invalid user input
+   mobcap-invalid-amount: "§cPlease (also) provide the mob cap as an integer"
+   # supports placeholder {world_name}
+   mobcap-no-apocalypse: "§7There is no §4Zombie§2Apocalypse§7 in world '{world_name}'"
+   # supports placeholders {world_name} and {mobcap} for the new mob cap
+   mobcap-success: "§aSet the maximum zombie spawns per chunk to {mobcap} in world '{world_name}'"
 
    # invalid-world supports placeholder {world_name}
-   invalid-world: "§cWorld '{world_name}' doesn't exist"
+   invalid-world: "§cWorld '{world_name}' doesn't exist or isn't loaded"
+
+   # only for when this plugin is used from console and no world name is provided
+   console-no-world-provided: "Please also provide the name of the world"
 
    # The text that will show up in the bar on the top of the screen in apocalyptic worlds
    apocalypse-boss-bar-title: "§5Zombie apocalypse ongoing!"

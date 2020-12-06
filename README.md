@@ -8,4 +8,4 @@ If something crashes or doesn't work, feel free to post a [issue](https://github
 Have a suggestion to improve this plugin? Let me know on the Spigot discussion page or in a discussion
 
 ## Inspiration
-This idea of this plugin comes from a video of youtuber Dream, called "Minecraft, But It's a Zombie Apocalypse"
+This idea of this plugin comes from a video of youtuber Dream, called "Minecraft, But It's a Zombie Apocalypse". I have made this work myself and am I no way affiliated with Dream.

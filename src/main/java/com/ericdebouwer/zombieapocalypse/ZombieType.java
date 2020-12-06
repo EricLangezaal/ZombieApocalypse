@@ -27,7 +27,7 @@ public enum ZombieType{
 				}
 			}
 		}
-		return ZombieType.DEFAULT;
+		return null;
 	}
 	
 	public static Zombie set(Zombie zombie, ZombieType zombieType){

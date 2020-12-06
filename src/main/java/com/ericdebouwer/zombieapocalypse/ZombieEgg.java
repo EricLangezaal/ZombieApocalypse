@@ -46,24 +46,24 @@ public class ZombieEgg implements Listener, CommandExecutor, TabCompleter{
 			return true;
 		}
 		
-		if (args.length == 1){
-			try {
-				ZombieType type = ZombieType.valueOf(args[0].toUpperCase());
-				ItemStack zombieEgg = new ItemStack(Material.ZOMBIE_SPAWN_EGG);
-				ItemMeta meta = zombieEgg.getItemMeta();
-				meta.getPersistentDataContainer().set(zombieTypeKey, PersistentDataType.STRING, type.toString());
-				String itemName = WordUtils.capitalizeFully(type.toString()) + " Zombie Egg";
-				meta.setDisplayName(ChatColor.RESET + itemName);
-				zombieEgg.setItemMeta(meta);
-				player.getInventory().addItem(zombieEgg);
-				plugin.getConfigManager().sendMessage(player, Message.EGG_GIVEN, ImmutableMap.of("item_name", itemName));
-				
-			}catch (IllegalArgumentException e){
-				plugin.getConfigManager().sendMessage(player, Message.INVALID_ZOMBIE, ImmutableMap.of("input", args[0]));
-			}
-			return true;
+		if (args.length < 1) return false;
+		
+		try {
+			ZombieType type = ZombieType.valueOf(args[0].toUpperCase());
+			ItemStack zombieEgg = new ItemStack(Material.ZOMBIE_SPAWN_EGG);
+			ItemMeta meta = zombieEgg.getItemMeta();
+			meta.getPersistentDataContainer().set(zombieTypeKey, PersistentDataType.STRING, type.toString());
+			String itemName = WordUtils.capitalizeFully(type.toString()) + " Zombie Egg";
+			meta.setDisplayName(ChatColor.RESET + itemName);
+			zombieEgg.setItemMeta(meta);
+			player.getInventory().addItem(zombieEgg);
+			plugin.getConfigManager().sendMessage(player, Message.EGG_GIVEN, ImmutableMap.of("item_name", itemName));
+			
+		}catch (IllegalArgumentException e){
+			plugin.getConfigManager().sendMessage(player, Message.INVALID_ZOMBIE, ImmutableMap.of("input", args[0]));
 		}
-		return false;
+		return true;
+	
 	}
 
 	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {

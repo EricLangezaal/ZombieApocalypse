@@ -3,15 +3,14 @@ package com.ericdebouwer.zombieapocalypse;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World.Environment;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
+import org.bukkit.entity.PigZombie;
 import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -23,6 +22,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Consumer;
 import org.bukkit.util.Vector;
 
 public class ZombieEvents implements Listener{
@@ -37,7 +37,9 @@ public class ZombieEvents implements Listener{
 	private void onMobSpawn(CreatureSpawnEvent e){
 		if (!(plugin.getApocalypseManager().isApocalypse(e.getLocation().getWorld().getName()))) return;
 		if (!(e.getEntity() instanceof Monster)) return;
-		if (!Arrays.asList(SpawnReason.SPAWNER, SpawnReason.NATURAL, SpawnReason.INFECTION, SpawnReason.SILVERFISH_BLOCK, SpawnReason.DROWNED).contains(e.getSpawnReason())) return;
+		//if (!Arrays.asList(SpawnReason.SPAWNER, SpawnReason.NATURAL, SpawnReason.INFECTION, SpawnReason.SILVERFISH_BLOCK, SpawnReason.DROWNED).contains(e.getSpawnReason())) return;
+		
+		if (e.getEntity() instanceof Zombie && ZombieType.getType((Zombie) e.getEntity()) != null) return;
 		
 		e.setCancelled(true);
 		this.spawnZombie(e.getLocation());
@@ -51,8 +53,8 @@ public class ZombieEvents implements Listener{
 	}
 	
 	public Zombie spawnZombie(Location loc, ZombieType type){
-		Zombie zombie = this.spawnForEnvironment(loc);
-		zombie = ZombieType.set(zombie, type);
+		Zombie zombie = this.spawnForEnvironment(loc, type);
+		zombie.setRemoveWhenFarAway(true);
 		if (zombie.getVehicle() != null){
 			zombie.getVehicle().remove();
 		}
@@ -100,13 +102,22 @@ public class ZombieEvents implements Listener{
 		return zombie;
 	}
 	
-	public Zombie spawnForEnvironment(Location loc){
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public Zombie spawnForEnvironment(Location loc, ZombieType type){
+		Class environmentType = (loc.getWorld().getEnvironment() == Environment.NETHER) ? PigZombie.class : Zombie.class;
+		Consumer<Zombie> action =  new Consumer<Zombie>() {
+			@Override
+			public void accept(Zombie zomb){
+				ZombieType.set(zomb, type);
+			}
+		};
 		Zombie zombie;
-		if (loc.getWorld().getEnvironment() == Environment.NETHER){
-			zombie = (Zombie) loc.getWorld().spawnEntity(loc, EntityType.PIG_ZOMBIE);
+		if (plugin.isPaperMC){
+			// as Paper ignores all other spawns in mob cap
+			zombie = loc.getWorld().spawn(loc, environmentType , SpawnReason.NATURAL, action);
 		}
 		else {
-			zombie = (Zombie) loc.getWorld().spawnEntity(loc, EntityType.ZOMBIE);
+			zombie = loc.getWorld().spawn(loc, environmentType, action);
 		}
 		return zombie;
 	}
@@ -115,6 +126,8 @@ public class ZombieEvents implements Listener{
 	private void onDeath(EntityDeathEvent e){
 		if (!(e.getEntity() instanceof Zombie)) return;
 		Zombie zombie = (Zombie) e.getEntity();
+		
+		e.getDrops().removeIf(i -> i.getType() == Material.PLAYER_HEAD);
 		
 		ZombieType type = ZombieType.getType(zombie);
 		if (type == ZombieType.BOOMER){
@@ -147,14 +160,5 @@ public class ZombieEvents implements Listener{
 			}.runTask(plugin);
 		}
 	}
-	
-	@EventHandler
-	public void zombieDead(EntityDeathEvent e){
-		if (!(e.getEntity() instanceof Zombie)) return;
-		List<ItemStack> newDrops = e.getDrops().stream().filter(i -> i.getType() != Material.PLAYER_HEAD).collect(Collectors.toList());
-		e.getDrops().clear();
-		e.getDrops().addAll(newDrops);
-	}
-	
 	
 }

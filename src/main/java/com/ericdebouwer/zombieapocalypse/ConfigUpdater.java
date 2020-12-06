@@ -114,7 +114,7 @@ public class ConfigUpdater {
 
             writer.write(prefixSpaces + actualKey + ": " + yaml.dump(obj));
         } else if (obj instanceof List) {
-            writeList((List) obj, actualKey, prefixSpaces, yaml, writer);
+            writeList((List<?>) obj, actualKey, prefixSpaces, yaml, writer);
         } else {
             writer.write(prefixSpaces + actualKey + ": " + yaml.dump(obj));
         }
@@ -132,11 +132,11 @@ public class ConfigUpdater {
     }
 
     //Writes a list of any object
-    private static void writeList(List list, String actualKey, String prefixSpaces, Yaml yaml, BufferedWriter writer) throws IOException {
+    private static void writeList(List<?> list, String actualKey, String prefixSpaces, Yaml yaml, BufferedWriter writer) throws IOException {
         writer.write(getListAsString(list, actualKey, prefixSpaces, yaml));
     }
 
-    private static String getListAsString(List list, String actualKey, String prefixSpaces, Yaml yaml) {
+    private static String getListAsString(List<?> list, String actualKey, String prefixSpaces, Yaml yaml) {
         StringBuilder builder = new StringBuilder(prefixSpaces).append(actualKey).append(":");
 
         if (list.isEmpty()) {
@@ -226,7 +226,7 @@ public class ConfigUpdater {
                 appendSection(builder, (ConfigurationSection) value, prefixSpaces, yaml);
                 prefixSpaces.setLength(prefixSpaces.length() - 2);
             } else if (value instanceof List) {
-                builder.append(getListAsString((List) value, actualKey, prefixSpaces.toString(), yaml));
+                builder.append(getListAsString((List<?>) value, actualKey, prefixSpaces.toString(), yaml));
             } else {
                 builder.append(prefixSpaces.toString()).append(actualKey).append(": ").append(yaml.dump(value));
             }
