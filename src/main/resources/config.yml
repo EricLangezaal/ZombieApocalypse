@@ -14,36 +14,64 @@
 # This is shown before all messages this plugin sends in chat
 plugin-prefix: "§7<<§4Zombie§2Apocalypse§7>>§r "
 
+# whether the plugin will check for updates on start-up
+check-for-updates: true
+
 # Settings for the different types of zombies.
-# To stop a zombie from spawning, simply remove it from this list! (You can still get a spawn egg from it, but it won't have the custom head)
-# 
-# You can specify a texture url for a Minecraft skin, whose head will be put on the zombie to mark them as special
-# - To find these URls, take a look at https://minecraft-heads.com/custom-heads
-# - Once you find a head you like, scroll all the way down to "Other". Grab the blue link that starts with 'http://textures.minecraft.net/..."
-#
-# To give them a default head, simply use "" for the head texture url!
+# For more details see: https://github.com/EricLangezaal/ZombieApocalypse/wiki/Configuring-the-zombies
 zombies:
-   DEFAULT: 
+   DEFAULT:
+      enabled: true
       head: ""
    SPRINTER:
+      enabled: true
       head: "http://textures.minecraft.net/texture/608d83a505cb9220db26e0ce87187c7b46dcc7b1d171ec23752bab0f7a87e2e7"
+      attributes:
+         generic_movement_speed: 0.45
    BOOMER:
+      enabled: true
       head: "http://textures.minecraft.net/texture/3ec33735f71e2b7756d7cfafcf5cb0a9cd357d4174a47c5f073c1134902cf4d"
    THROWER:
+      enabled: true
       head: "http://textures.minecraft.net/texture/4fd55a13b973d6d4cc5badda11c8a0436470b601a9883b91c4b59c48c9a76aab"
    TANK:
+      enabled: true
       head: "http://textures.minecraft.net/texture/65e97ef120d94e916d196fc65c141a31c20540b083daf86a00b201885b4ef49c"
+      attributes:
+         generic_movement_speed: 0.2
+         generic_max_health: 40.0
+         generic_knockback_resistance: 1
+         generic_attack_damage: 10.0
+
    NINJA:
+      enabled: true
       head: "http://textures.minecraft.net/texture/b72fdeb1274cba67316b206c9f77438964c90971af996c35be2395f6477469b"
+      attributes:
+         generic_movement_speed: 0.4
+         generic_max_health: 10.0
+         generic_attack_damage: 6.0
    MULTIPLIER:
+      enabled: true
       head: "http://textures.minecraft.net/texture/bf938ae03138b2d022d6280858fc67e2612086e8112f9d1546764561978425b1"
    JUMPER:
+      enabled: true
       head: "http://textures.minecraft.net/texture/a20e84d32d1e9c919d3fdbb53f2b37ba274c121c57b2810e5a472f40dacf004f"
    PILLAR:
+      enabled: true
       head: ""
     
 # whether or not some of the zombies can spawn as babies, like zombies normally do
 allow-babies: true
+
+# zombies with custom heads will never burn, should the ones without burn in the day?
+burn-in-day: false
+
+# whether or not the bossbar appears for players inside an apocalypse
+do-bossbar: true
+
+# if zombies (currently only boomer) should do block damage
+do-zombie-block-damage: true
+
 
 messages:
    no-command-permission: "§4§lSorry§r§7, you don't have permission for that!"

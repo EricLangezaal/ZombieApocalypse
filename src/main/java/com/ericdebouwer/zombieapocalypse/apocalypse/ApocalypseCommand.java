@@ -1,9 +1,14 @@
-package com.ericdebouwer.zombieapocalypse;
+package com.ericdebouwer.zombieapocalypse.apocalypse;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.ericdebouwer.zombieapocalypse.ZombieApocalypse;
+import com.ericdebouwer.zombieapocalypse.config.ConfigurationManager;
+import com.ericdebouwer.zombieapocalypse.config.Message;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -14,13 +19,13 @@ import com.google.common.collect.ImmutableMap;
 
 public class ApocalypseCommand implements CommandExecutor, TabCompleter {
 	
-	private ZombieApocalypse plugin;
-	private ConfigurationManager configManager;
+	private final ZombieApocalypse plugin;
+	private final ConfigurationManager configManager;
 	
-	private String START_ARG = "start";
-	private String END_ARG = "end";
-	private String MOBCAP_ARG = "setlimit";
-	private String RELOAD_ARG = "reload";
+	private final String START_ARG = "start";
+	private final String END_ARG = "end";
+	private final String MOBCAP_ARG = "setlimit";
+	private final String RELOAD_ARG = "reload";
 	
 	public List<String> arguments;
 	
@@ -41,6 +46,7 @@ public class ApocalypseCommand implements CommandExecutor, TabCompleter {
 		
 		if (args[0].equalsIgnoreCase(RELOAD_ARG)){
 			configManager.reloadConfig();
+			plugin.getApocalypseManager().reload();
 			if (configManager.isValid()) configManager.sendMessage(sender, Message.RELOAD_SUCCESS, null);
 			else configManager.sendMessage(sender, Message.RELOAD_FAIL, null);
 			return true;
@@ -87,7 +93,7 @@ public class ApocalypseCommand implements CommandExecutor, TabCompleter {
 			if (args.length >= 3){
 				try{
 					int duration = Integer.parseInt(args[2]); //minutes
-					endTime = java.time.Instant.now().getEpochSecond() + duration * 60;
+					endTime = java.time.Instant.now().getEpochSecond() + duration * 60L;
 				}catch (NumberFormatException e){
 					configManager.sendMessage(sender, Message.START_INVALID_INT, ImmutableMap.of("input", args[2]));
 					return true;
@@ -95,7 +101,7 @@ public class ApocalypseCommand implements CommandExecutor, TabCompleter {
 			}
 			result = manager.startApocalypse(worldName, endTime);
 		}else {
-			result = manager.endApocalypse(worldName);
+			result = manager.endApocalypse(worldName, true);
 		}
 		
 		Message success = args[0].equalsIgnoreCase(START_ARG)? Message.START_SUCCESS : Message.END_SUCCESS;
@@ -115,14 +121,14 @@ public class ApocalypseCommand implements CommandExecutor, TabCompleter {
 			return plugin.filter(arguments, args[0]);	
 		}
 		else if (args.length == 2){
-			List<String> worldNames = plugin.getServer().getWorlds().stream().map(w -> w.getName()).collect(Collectors.toList());
+			List<String> worldNames = plugin.getServer().getWorlds().stream().map(World::getName).collect(Collectors.toList());
 			return plugin.filter(worldNames, args[1]);
 		}
 		else if (args.length == 3 && args[0].equalsIgnoreCase(START_ARG)){
 			return plugin.filter(Arrays.asList("5", "10", "60", "240"), args[2]);
 		}
 		else if (args.length == 3 && args[0].equalsIgnoreCase(MOBCAP_ARG)){
-			return plugin.filter(Arrays.asList("70"), args[2]);
+			return plugin.filter(Collections.singletonList("70"), args[2]);
 		}
 		return Collections.emptyList();
 	}

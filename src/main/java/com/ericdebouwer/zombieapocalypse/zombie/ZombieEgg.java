@@ -1,9 +1,12 @@
-package com.ericdebouwer.zombieapocalypse;
+package com.ericdebouwer.zombieapocalypse.zombie;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.ericdebouwer.zombieapocalypse.ZombieApocalypse;
+import com.ericdebouwer.zombieapocalypse.api.ZombieSpawnedEvent;
+import com.ericdebouwer.zombieapocalypse.config.Message;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -68,7 +71,7 @@ public class ZombieEgg implements Listener, CommandExecutor, TabCompleter{
 
 	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
 		if (args.length == 1 && sender.hasPermission("apocalypse.zombie")){
-			ArrayList<String> result = new ArrayList<String>();
+			List<String> result = new ArrayList<>();
 			for (ZombieType type: ZombieType.values()){
 				String name = type.toString().toLowerCase();
 				if (name.startsWith(args[0])) result.add(name);
@@ -83,17 +86,19 @@ public class ZombieEgg implements Listener, CommandExecutor, TabCompleter{
 		if (e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getItem() == null) return;
 		if (!(e.getItem().hasItemMeta())) return;
 		PersistentDataContainer container = e.getItem().getItemMeta().getPersistentDataContainer();
-		if (container.has(zombieTypeKey, PersistentDataType.STRING)){
-			e.setCancelled(true);
-			try {
-				ZombieType type = ZombieType.valueOf(container.get(zombieTypeKey, PersistentDataType.STRING));
-				Location spawnLoc = e.getClickedBlock().getLocation().add(0, 1, 0);
-				plugin.getZombieManager().spawnZombie(spawnLoc, type);
-			}
-			catch (IllegalArgumentException ex){
-				e.getPlayer().sendMessage(ChatColor.GRAY + "Invalid zombie egg :(, try getting a new one!");
-			}
+		if (!container.has(zombieTypeKey, PersistentDataType.STRING)) return;
+
+		e.setCancelled(true);
+
+		try {
+			ZombieType type = ZombieType.valueOf(container.get(zombieTypeKey, PersistentDataType.STRING));
+			Location spawnLoc = e.getClickedBlock().getLocation().add(0, 1, 0);
+			plugin.getZombieFactory().spawnZombie(spawnLoc, type, ZombieSpawnedEvent.SpawnReason.SPAWN_EGG);
 		}
+		catch (IllegalArgumentException ex){
+			e.getPlayer().sendMessage(ChatColor.GRAY + "Invalid zombie egg :(, try getting a new one!");
+		}
+
 	}
 	
 

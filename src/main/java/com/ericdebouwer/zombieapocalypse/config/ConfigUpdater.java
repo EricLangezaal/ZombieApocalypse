@@ -1,4 +1,4 @@
-package com.ericdebouwer.zombieapocalypse;
+package com.ericdebouwer.zombieapocalypse.config;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;

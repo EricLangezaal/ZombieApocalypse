@@ -1,4 +1,4 @@
-package com.ericdebouwer.zombieapocalypse;
+package com.ericdebouwer.zombieapocalypse.apocalypse;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,14 +8,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import com.ericdebouwer.zombieapocalypse.ZombieApocalypse;
+import com.ericdebouwer.zombieapocalypse.config.Message;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.NamespacedKey;
 import org.bukkit.World;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarFlag;
-import org.bukkit.boss.BarStyle;
-import org.bukkit.boss.BossBar;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -25,7 +22,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.world.WorldLoadEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import com.google.common.collect.ImmutableMap;
@@ -40,16 +36,11 @@ public class ApocalypseManager implements Listener {
 	
 	private List<ApocalypseWorld> apocalypseWorlds = new ArrayList<>();
 	private Map<String, BukkitTask> apoEnders = new HashMap<>();
-	
-	private BossBar bossBar;
+
 	private ZombieApocalypse plugin;
 	
 	public ApocalypseManager(ZombieApocalypse plugin){
 		this.plugin = plugin;
-		
-		NamespacedKey nameKey = new NamespacedKey(plugin, "apocalypsebar");
-		String barTitle = plugin.getConfigManager().getString(Message.BOSS_BAR_TITLE);
-		bossBar = plugin.getServer().createBossBar(nameKey, barTitle, BarColor.PURPLE, BarStyle.SOLID, BarFlag.CREATE_FOG);
 		
 		this.createFile();
 		if (apoConfig == null) return;
@@ -85,7 +76,7 @@ public class ApocalypseManager implements Listener {
 		try{
 			for (ApocalypseWorld world: apocalypseWorlds){
 				apoConfig.set(world.worldName + UNTIL_KEY, world.endTime);
-				apoConfig.set(world.worldName + MOB_CAP_KEY, world.mobcap);
+				apoConfig.set(world.worldName + MOB_CAP_KEY, world.mobCap);
 			}
 			this.apoConfig.save(apoFile);
 		} catch (IOException | NullPointerException e){
@@ -94,8 +85,13 @@ public class ApocalypseManager implements Listener {
 	}
 	
 	public void onDisable(){
-		for (Player player: Bukkit.getOnlinePlayers()){
-			bossBar.removePlayer(player);
+		for (World world: Bukkit.getWorlds()){
+			Optional<ApocalypseWorld> apoWorld = getApoWorld(world.getName());
+			if (!apoWorld.isPresent()) continue;
+
+			for (Player player: world.getPlayers()){
+				apoWorld.get().removePlayer(player);
+			}
 		}
 		this.saveConfig();
 	}
@@ -103,11 +99,7 @@ public class ApocalypseManager implements Listener {
 	private void addEndDelay(final String worldName, long endTime){
 		long now = java.time.Instant.now().getEpochSecond();
 		long delay = (endTime-now) * 20;
-		BukkitTask task = new BukkitRunnable(){
-			public void run() {
-				endApocalypse(worldName);
-			}
-		}.runTaskLater(plugin, delay);
+		BukkitTask task = Bukkit.getScheduler().runTaskLater(plugin, () -> endApocalypse(worldName, true), delay);
 		apoEnders.put(worldName, task);
 	}
 	
@@ -123,15 +115,17 @@ public class ApocalypseManager implements Listener {
 		return this.startApocalypse(worldName, endTime, Bukkit.getMonsterSpawnLimit(), true);
 	}
 	
-	public boolean startApocalypse(String worldName, long endTime, int mobCap, boolean firstTime){
+	public boolean startApocalypse(String worldName, long endTime, int mobCap, boolean broadCast){
+		if (isApocalypse(worldName)) return false;
 		File potentialWorld = new File(Bukkit.getServer().getWorldContainer(), worldName);
 		if (!potentialWorld.exists() || !potentialWorld.isDirectory()) return false;
 		
-		ApocalypseWorld apoWorld = new ApocalypseWorld(worldName, endTime, mobCap);
+		ApocalypseWorld apoWorld = new ApocalypseWorld(plugin, worldName, endTime, mobCap);
 		apocalypseWorlds.add(apoWorld);
 		
 		if (endTime > 0){
 			this.addEndDelay(worldName, endTime);
+			apoWorld.startCountDown();
 		}
 		
 		World world = Bukkit.getWorld(worldName);
@@ -140,8 +134,8 @@ public class ApocalypseManager implements Listener {
 		world.setMonsterSpawnLimit(mobCap);
 		
 		for (Player player: world.getPlayers()){
-			if (firstTime) plugin.getConfigManager().sendMessage(player, Message.START_BROADCAST,  ImmutableMap.of("world_name", worldName));
-			bossBar.addPlayer(player);
+			if (broadCast) plugin.getConfigManager().sendMessage(player, Message.START_BROADCAST,  ImmutableMap.of("world_name", worldName));
+			apoWorld.addPlayer(player);
 		}
 		return true;
 	}
@@ -157,47 +151,58 @@ public class ApocalypseManager implements Listener {
 		
 	}
 	
-	public boolean endApocalypse(String worldName){
-		if (!isApocalypse(worldName)) return false;
-		apocalypseWorlds.remove(this.getApoWorld(worldName).get());
+	public boolean endApocalypse(String worldName, boolean broadCast){
+		Optional<ApocalypseWorld> apoWorld = this.getApoWorld(worldName);
+		if (!apoWorld.isPresent()) return false;
+
+		apocalypseWorlds.remove(apoWorld.get());
 		apoEnders.remove(worldName);
 		apoConfig.set(worldName, null);
+		apoWorld.get().endCountDown();
+
 		this.saveConfig();
 		
 		World world = Bukkit.getWorld(worldName);
 		if (world == null) return true;
+
+		world.setMonsterSpawnLimit(-1);
 		
 		for (Player player: world.getPlayers()){
-			bossBar.removePlayer(player);
-			plugin.getConfigManager().sendMessage(player, Message.END_BROADCAST, ImmutableMap.of("world_name", worldName));
+			apoWorld.get().removePlayer(player);
+			if (broadCast) plugin.getConfigManager().sendMessage(player, Message.END_BROADCAST, ImmutableMap.of("world_name", worldName));
 		}
 		
-		for (Zombie zomb: world.getEntitiesByClass(Zombie.class)){
-			zomb.remove();
+		for (Zombie zombie: world.getEntitiesByClass(Zombie.class)){
+			zombie.remove();
 		}
 		return true;
+	}
+
+	public void reload(){
+		for (ApocalypseWorld apoWorld: apocalypseWorlds){
+			apoWorld.reloadBossBar();
+		}
 	}
 	
 	@EventHandler
 	public void worldLoad(WorldLoadEvent e){
 		Optional<ApocalypseWorld> apoWorld = this.getApoWorld(e.getWorld().getName());
 		if (!apoWorld.isPresent()) return;
-		e.getWorld().setMonsterSpawnLimit(apoWorld.get().mobcap);
+		e.getWorld().setMonsterSpawnLimit(apoWorld.get().mobCap);
 	}
 	
 	@EventHandler
 	public void worldSwitch(PlayerChangedWorldEvent e){
-		bossBar.removePlayer(e.getPlayer());
-		World to = e.getPlayer().getWorld();
-		if (isApocalypse(to.getName())){
-			bossBar.addPlayer(e.getPlayer());
-		}
+		Optional<ApocalypseWorld> apoFrom = this.getApoWorld(e.getFrom().getName());
+		apoFrom.ifPresent(aw -> aw.removePlayer(e.getPlayer()));
+
+		Optional<ApocalypseWorld> apoTo = this.getApoWorld(e.getPlayer().getWorld().getName());
+		apoTo.ifPresent(aw -> aw.addPlayer(e.getPlayer()));
 	}
 	
 	@EventHandler
 	public void newPlayerJoin(PlayerJoinEvent e){
-		if (isApocalypse(e.getPlayer().getWorld().getName())){
-			bossBar.addPlayer(e.getPlayer());
-		}
+		Optional<ApocalypseWorld> apoWorld = this.getApoWorld(e.getPlayer().getWorld().getName());
+		apoWorld.ifPresent(aw -> aw.addPlayer(e.getPlayer()));
 	}
 }
