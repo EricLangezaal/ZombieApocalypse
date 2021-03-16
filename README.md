@@ -6,7 +6,7 @@ To see an explanation of this plugin, along with its usage and commands, see its
 ### Want to see how to configure the zombie settings? [Click here](https://github.com/EricLangezaal/ZombieApocalypse/wiki/Configuring-the-zombies).
 If something crashes or doesn't work, feel free to post a [issue](https://github.com/EricLangezaal/ZombieApocalypse/issues) here.
 
-Have a suggestion to improve this plugin? Let me know on the Spigot discussion page or in a discussion
+Have a suggestion to improve this plugin? Let me know on the Spigot discussion page or in a Spigot private message.
 
 ## Developer API
 Since version 1.3, this plugin has a large developer API. For an overview, [see the wiki!](https://github.com/EricLangezaal/ZombieApocalypse/wiki/)
