@@ -72,6 +72,13 @@ do-bossbar: true
 # if zombies (currently only boomer) should do block damage
 do-zombie-block-damage: true
 
+# if set to false, it will spawn 'overworld' zombies in the nether,
+# by default those will be zombified pigmen/piglins instead
+spawn-pigmen-in-nether: true
+
+# whether players can sleep when there is an apocalypse ongoing
+allow-sleep: true
+
 
 messages:
    no-command-permission: "§4§lSorry§r§7, you don't have permission for that!"
@@ -111,6 +118,9 @@ messages:
 
    # The text that will show up in the bar on the top of the screen in apocalyptic worlds
    apocalypse-boss-bar-title: "§5Zombie apocalypse ongoing!"
+
+   # sent when a player tries to sleep and `allow-sleep` (see above) is set to false.
+   no-apocalypse-sleep: "§7That would be a little too easy..."
 
    # given-zombie-egg supports placeholder {item_name} for the name of the egg just received
    given-zombie-egg: "§7You have been given a §r§6{item_name}"

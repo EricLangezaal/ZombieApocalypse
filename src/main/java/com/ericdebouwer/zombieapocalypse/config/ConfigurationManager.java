@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 
 import com.ericdebouwer.zombieapocalypse.ZombieApocalypse;
 import com.ericdebouwer.zombieapocalypse.zombie.ZombieType;
@@ -31,14 +30,16 @@ public class ConfigurationManager {
 	public String pluginPrefix;
 	public boolean checkUpdates = true;
 	public boolean doBabies = true;
+	public boolean doNetherPigmen = true;
 	public boolean burnInDay = true;
 	public boolean blockDamage = true;
 	public boolean doBossBar = true;
 	public boolean bossBarFog = true;
+	public boolean allowSleep = true;
 
 	private boolean isValid;
 	
-	private Map<ZombieType, ZombieWrapper> zombieWrappers = new HashMap<>();
+	private final Map<ZombieType, ZombieWrapper> zombieWrappers = new HashMap<>();
 	
 	public ConfigurationManager(ZombieApocalypse plugin){
 		this.plugin = plugin;
@@ -58,13 +59,13 @@ public class ConfigurationManager {
 			if (handleUpdate()){
 				plugin.reloadConfig();
 				if (validateConfig(false)) {
-					Bukkit.getLogger().log(Level.INFO, ZombieApocalypse.logPrefix + "================================================================");
-		        	Bukkit.getLogger().log(Level.INFO, ZombieApocalypse.logPrefix + "Automatically updated old/invalid configuration file!");
-		        	Bukkit.getLogger().log(Level.INFO, ZombieApocalypse.logPrefix + "================================================================");
+					plugin.getLogger().info("================================================================");
+					plugin.getLogger().info("Automatically updated old/invalid configuration file!");
+					plugin.getLogger().info("================================================================");
 		        	return true;
 				}
 			}
-			Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.RED + ZombieApocalypse.logPrefix + "Automatic configuration update failed! You can delete the old 'config.yml' to get a new one.");
+			Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.RED + plugin.logPrefix + "Automatic configuration update failed! You can delete the old 'config.yml' to get a new one.");
 		}
 		return valid;
 	}
@@ -73,10 +74,12 @@ public class ConfigurationManager {
 		pluginPrefix = plugin.getConfig().getString("plugin-prefix");
 		checkUpdates = plugin.getConfig().getBoolean("check-for-updates");
 		doBabies = plugin.getConfig().getBoolean("allow-babies");
+		doNetherPigmen = plugin.getConfig().getBoolean("spawn-pigmen-in-nether");
 		burnInDay = plugin.getConfig().getBoolean("burn-in-day");
 		blockDamage = plugin.getConfig().getBoolean("do-zombie-block-damage");
 		doBossBar = plugin.getConfig().getBoolean("do-bossbar");
 		bossBarFog = plugin.getConfig().getBoolean("bossbar-fog", true);
+		allowSleep = plugin.getConfig().getBoolean("allow-sleep");
 
 		zombieWrappers.clear();
 		
@@ -88,7 +91,7 @@ public class ConfigurationManager {
 				ZombieWrapper wrapper = new ZombieWrapper(type, section.getConfigurationSection(zombie));
 				zombieWrappers.put(type, wrapper);
 			} catch (IllegalArgumentException e){
-				Bukkit.getConsoleSender().sendMessage(ChatColor.BOLD + "" +ChatColor.RED + ZombieApocalypse.logPrefix +"Zombie type '" + zombie + "' doesn't exist and isn't loaded in.");
+				Bukkit.getConsoleSender().sendMessage(ChatColor.BOLD + "" + ChatColor.RED + plugin.logPrefix + "Zombie type '" + zombie + "' doesn't exist and isn't loaded in.");
 			}
 		}
 	}
@@ -104,7 +107,7 @@ public class ConfigurationManager {
 		String colorMsg = ChatColor.translateAlternateColorCodes('§', this.pluginPrefix + msg);
 		if (replacements != null){
 			for (Map.Entry<String, String> entry: replacements.entrySet()){
-				colorMsg = colorMsg.replaceAll("\\{" + entry.getKey() + "\\}", entry.getValue());
+				colorMsg = colorMsg.replace("{"  + entry.getKey() + "}", entry.getValue());
 			}
 		}
 		p.sendMessage(colorMsg);		
@@ -127,7 +130,7 @@ public class ConfigurationManager {
         
  		for(String key: templateSection.getKeys(deep)){
  			if (!realSection.getKeys(deep).contains(key) || templateSection.get(key).getClass() != realSection.get(key).getClass()){
- 				if (log) Bukkit.getLogger().log(Level.WARNING, ZombieApocalypse.logPrefix + "Missing or invalid datatype key '" + key + "' and possibly others in config.yml");
+ 				if (log) plugin.getLogger().warning("Missing or invalid datatype key '" + key + "' and possibly others in config.yml");
  				return false;
  			}
  		}

@@ -11,18 +11,18 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Zombie;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.lang.reflect.Field;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.logging.Level;
 
 public class ZombieWrapper {
 
     private ItemStack head;
-    private ZombieType type;
+    private final ZombieType type;
     public Map<Attribute, Double> attributes = new HashMap<>();
 
     public ZombieWrapper(ZombieType type){
@@ -42,7 +42,7 @@ public class ZombieWrapper {
             try {
                 attributes.put(Attribute.valueOf(attribute.toUpperCase()), attributeSection.getDouble(attribute));
             } catch (IllegalArgumentException e){
-                Bukkit.getLogger().log(Level.INFO,  ZombieApocalypse.logPrefix + "Attribute " + attribute + " does not exist!");
+                JavaPlugin.getPlugin(ZombieApocalypse.class).getLogger().info("Attribute " + attribute + " does not exist!");
             }
         }
     }
@@ -66,7 +66,6 @@ public class ZombieWrapper {
 
         ItemStack head = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta headMeta = (SkullMeta) head.getItemMeta();
-
         
         GameProfile profile = new GameProfile(UUID.randomUUID(), null);
         byte[] encodedData = Base64.getEncoder().encode(String.format("{textures:{SKIN:{url:\"%s\"}}}", textureUrl).getBytes());
@@ -77,7 +76,7 @@ public class ZombieWrapper {
             profileField.setAccessible(true);
             profileField.set(headMeta, profile);
         } catch (NoSuchFieldException | IllegalArgumentException | IllegalAccessException e1) {
-            Bukkit.getLogger().log(Level.INFO,  ZombieApocalypse.logPrefix + "Zombie head could not be set, is the minecraft version correct?");
+            JavaPlugin.getPlugin(ZombieApocalypse.class).getLogger().info("Zombie head could not be set, is the minecraft version correct?");
         }
         head.setItemMeta(headMeta);
         return head;

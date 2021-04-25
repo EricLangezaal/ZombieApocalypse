@@ -7,6 +7,7 @@ import com.ericdebouwer.zombieapocalypse.config.ZombieWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.PigZombie;
 import org.bukkit.entity.Zombie;
 import org.bukkit.event.entity.CreatureSpawnEvent;
@@ -20,7 +21,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class ZombieFactory {
 
-    private ZombieApocalypse plugin;
+    private final ZombieApocalypse plugin;
 
     public ZombieFactory(ZombieApocalypse plugin){
         this.plugin = plugin;
@@ -76,7 +77,9 @@ public class ZombieFactory {
 
     @SuppressWarnings({ "unchecked", "rawtypes"})
     private Zombie spawnForEnvironment(Location loc, ZombieType type){
-        Class environmentType = (loc.getWorld().getEnvironment() == World.Environment.NETHER) ? PigZombie.class : Zombie.class;
+        boolean isNether = loc.getWorld().getEnvironment() == World.Environment.NETHER;
+        Class environmentType = (isNether && plugin.getConfigManager().doNetherPigmen) ? PigZombie.class : Zombie.class;
+
         Consumer<Zombie> action = zomb -> ZombieType.set(zomb, type);
         Zombie zombie;
         if (plugin.isPaperMC){
@@ -86,6 +89,11 @@ public class ZombieFactory {
         else {
             zombie = loc.getWorld().spawn(loc, environmentType, action);
         }
+
+        if (zombie.getType() == EntityType.ZOMBIE && isNether){
+            zombie.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, Integer.MAX_VALUE, 1, false, false));
+        }
+
         return zombie;
     }
 }

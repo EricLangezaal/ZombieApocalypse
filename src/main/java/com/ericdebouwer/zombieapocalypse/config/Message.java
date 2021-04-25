@@ -16,6 +16,7 @@ public enum Message {
 	EGG_GIVEN ("given-zombie-egg"),
 	INVALID_ZOMBIE ("invalid-egg-type"),
 	BOSS_BAR_TITLE ("apocalypse-boss-bar-title"),
+	NO_SLEEP ("no-apocalypse-sleep"),
 	CAP_NO_ARGS ("mobcap-too-few-arguments"),
 	CAP_INVALID_AMOUNT ("mobcap-invalid-amount"),
 	CAP_NO_APOCALYPSE("mobcap-no-apocalypse"),

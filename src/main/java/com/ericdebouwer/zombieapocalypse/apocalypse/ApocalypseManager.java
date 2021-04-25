@@ -18,7 +18,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.world.WorldLoadEvent;
@@ -26,7 +25,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 import com.google.common.collect.ImmutableMap;
 
-public class ApocalypseManager implements Listener {
+public class ApocalypseManager {
 
 	private File apoFile;
 	private FileConfiguration apoConfig;
@@ -34,10 +33,10 @@ public class ApocalypseManager implements Listener {
 	private final String UNTIL_KEY = ".until";
 	private final String MOB_CAP_KEY = ".mobcap";
 	
-	private List<ApocalypseWorld> apocalypseWorlds = new ArrayList<>();
-	private Map<String, BukkitTask> apoEnders = new HashMap<>();
+	private final List<ApocalypseWorld> apocalypseWorlds = new ArrayList<>();
+	private final Map<String, BukkitTask> apoEnders = new HashMap<>();
 
-	private ZombieApocalypse plugin;
+	private final ZombieApocalypse plugin;
 	
 	public ApocalypseManager(ZombieApocalypse plugin){
 		this.plugin = plugin;
@@ -182,27 +181,5 @@ public class ApocalypseManager implements Listener {
 		for (ApocalypseWorld apoWorld: apocalypseWorlds){
 			apoWorld.reloadBossBar();
 		}
-	}
-	
-	@EventHandler
-	public void worldLoad(WorldLoadEvent e){
-		Optional<ApocalypseWorld> apoWorld = this.getApoWorld(e.getWorld().getName());
-		if (!apoWorld.isPresent()) return;
-		e.getWorld().setMonsterSpawnLimit(apoWorld.get().mobCap);
-	}
-	
-	@EventHandler
-	public void worldSwitch(PlayerChangedWorldEvent e){
-		Optional<ApocalypseWorld> apoFrom = this.getApoWorld(e.getFrom().getName());
-		apoFrom.ifPresent(aw -> aw.removePlayer(e.getPlayer()));
-
-		Optional<ApocalypseWorld> apoTo = this.getApoWorld(e.getPlayer().getWorld().getName());
-		apoTo.ifPresent(aw -> aw.addPlayer(e.getPlayer()));
-	}
-	
-	@EventHandler
-	public void newPlayerJoin(PlayerJoinEvent e){
-		Optional<ApocalypseWorld> apoWorld = this.getApoWorld(e.getPlayer().getWorld().getName());
-		apoWorld.ifPresent(aw -> aw.addPlayer(e.getPlayer()));
 	}
 }

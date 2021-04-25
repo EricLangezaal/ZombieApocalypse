@@ -118,19 +118,23 @@ public class ApocalypseCommand implements CommandExecutor, TabCompleter {
 			return Collections.emptyList();
 		}
 		if (args.length == 1){
-			return plugin.filter(arguments, args[0]);	
+			return filter(arguments, args[0]);
 		}
 		else if (args.length == 2){
 			List<String> worldNames = plugin.getServer().getWorlds().stream().map(World::getName).collect(Collectors.toList());
-			return plugin.filter(worldNames, args[1]);
+			return filter(worldNames, args[1]);
 		}
 		else if (args.length == 3 && args[0].equalsIgnoreCase(START_ARG)){
-			return plugin.filter(Arrays.asList("5", "10", "60", "240"), args[2]);
+			return filter(Arrays.asList("5", "10", "60", "240"), args[2]);
 		}
 		else if (args.length == 3 && args[0].equalsIgnoreCase(MOBCAP_ARG)){
-			return plugin.filter(Collections.singletonList("70"), args[2]);
+			return filter(Collections.singletonList("70"), args[2]);
 		}
 		return Collections.emptyList();
+	}
+
+	public List<String> filter(List<String> original, String query){
+		return original.stream().filter(s -> s.startsWith(query)).collect(Collectors.toList());
 	}
 
 }

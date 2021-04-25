@@ -4,24 +4,27 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import com.ericdebouwer.zombieapocalypse.ZombieApocalypse;
 import com.ericdebouwer.zombieapocalypse.api.ZombieSpawnedEvent;
+import com.ericdebouwer.zombieapocalypse.config.Message;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.util.Vector;
 
-public class ZombieEvents implements Listener{
+public class ZombieListener implements Listener{
 
 	ZombieApocalypse plugin;
 	
-	public ZombieEvents(ZombieApocalypse plugin){
+	public ZombieListener(ZombieApocalypse plugin){
 		this.plugin = plugin;
 	}
 	
@@ -60,7 +63,7 @@ public class ZombieEvents implements Listener{
 		}
 	}
 	
-	@EventHandler
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	private void throwerHit(final EntityDamageByEntityEvent e){
 		if (!(e.getDamager() instanceof Zombie)) return;
 		if (!(e.getEntity() instanceof LivingEntity)) return;
@@ -82,6 +85,15 @@ public class ZombieEvents implements Listener{
 
 		ZombieType type = ZombieType.getType((Zombie) event.getEntity());
 		if (type != null) event.setCancelled(true);
+	}
+
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+	private void onSleep(PlayerBedEnterEvent event){
+		if (plugin.getConfigManager().allowSleep) return;
+		if (!plugin.getApocalypseManager().isApocalypse(event.getPlayer().getWorld().getName())) return;
+
+		plugin.getConfigManager().sendMessage(event.getPlayer(), Message.NO_SLEEP, null);
+		event.setCancelled(true);
 	}
 	
 }

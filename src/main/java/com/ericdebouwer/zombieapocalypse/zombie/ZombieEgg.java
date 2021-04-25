@@ -3,6 +3,9 @@ package com.ericdebouwer.zombieapocalypse.zombie;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.ericdebouwer.zombieapocalypse.ZombieApocalypse;
 import com.ericdebouwer.zombieapocalypse.api.ZombieSpawnedEvent;
@@ -71,12 +74,8 @@ public class ZombieEgg implements Listener, CommandExecutor, TabCompleter{
 
 	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
 		if (args.length == 1 && sender.hasPermission("apocalypse.zombie")){
-			List<String> result = new ArrayList<>();
-			for (ZombieType type: ZombieType.values()){
-				String name = type.toString().toLowerCase();
-				if (name.startsWith(args[0])) result.add(name);
-			}
-			return result;
+			return Stream.of(ZombieType.values()).map(t -> t.toString().toLowerCase())
+					.filter(t -> t.startsWith(args[0].toLowerCase())).collect(Collectors.toList());
 		}
 		return Collections.emptyList();
 	}
