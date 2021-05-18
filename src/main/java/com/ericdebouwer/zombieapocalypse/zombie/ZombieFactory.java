@@ -84,7 +84,7 @@ public class ZombieFactory {
         Zombie zombie;
         if (plugin.isPaperMC){
             // as Paper ignores all other spawns in mob cap
-            zombie = loc.getWorld().spawn(loc, environmentType , CreatureSpawnEvent.SpawnReason.NATURAL, action);
+            zombie = loc.getWorld().spawn(loc, environmentType , action, CreatureSpawnEvent.SpawnReason.NATURAL);
         }
         else {
             zombie = loc.getWorld().spawn(loc, environmentType, action);

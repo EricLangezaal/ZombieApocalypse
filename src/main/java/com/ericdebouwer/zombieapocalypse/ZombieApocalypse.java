@@ -1,8 +1,5 @@
 package com.ericdebouwer.zombieapocalypse;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import com.ericdebouwer.zombieapocalypse.apocalypse.ApocalypseCommand;
 import com.ericdebouwer.zombieapocalypse.apocalypse.ApocalypseListener;
 import com.ericdebouwer.zombieapocalypse.apocalypse.ApocalypseManager;
@@ -11,9 +8,14 @@ import com.ericdebouwer.zombieapocalypse.zombie.ZombieEgg;
 import com.ericdebouwer.zombieapocalypse.zombie.ZombieListener;
 import com.ericdebouwer.zombieapocalypse.zombie.ZombieFactory;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.util.Consumer;
 
 public class ZombieApocalypse extends JavaPlugin {
+
+	//TODO: setting if it should remove apocalypse zombies if apo ends
 
 	private ApocalypseManager apoManager;
 	private ConfigurationManager configManager;
@@ -49,10 +51,10 @@ public class ZombieApocalypse extends JavaPlugin {
 		getServer().getPluginManager().registerEvents(zombieCommand, this);
 		
 		try {
-			Class.forName("co.aikar.timings.Timings");
+			Class.forName("org.bukkit.World").getDeclaredMethod("spawn", Location.class, Class.class, Consumer.class, CreatureSpawnEvent.SpawnReason.class);
 		    isPaperMC = true;
-		    getServer().getConsoleSender().sendMessage(logPrefix + "PaperMC detected! Changing spawning algorithm accordingly");
-		} catch (ClassNotFoundException ignore) {
+		    getLogger().info("PaperMC detected! Changing spawning algorithm accordingly");
+		} catch (ClassNotFoundException | NoSuchMethodException ignore) {
 		}
 
 		getServer().getPluginManager().registerEvents(new ZombieListener(this), this);
