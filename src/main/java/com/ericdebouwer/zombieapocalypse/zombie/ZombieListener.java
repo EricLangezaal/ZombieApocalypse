@@ -34,7 +34,7 @@ public class ZombieListener implements Listener{
 		if (!(e.getEntity() instanceof Monster)) return;
 		
 		if (e.getEntity() instanceof Zombie && ZombieType.getType((Zombie) e.getEntity()) != null) return;
-		
+		if (e.getEntity().hasMetadata("ignoreZombie")) return;
 		e.setCancelled(true);
 		plugin.getZombieFactory().spawnZombie(e.getLocation());
 	}
