@@ -45,6 +45,7 @@ public class ApocalypseCommand implements CommandExecutor, TabCompleter {
 		}
 		
 		if (args[0].equalsIgnoreCase(RELOAD_ARG)){
+			plugin.getZombieFactory().reload();
 			configManager.reloadConfig();
 			plugin.getApocalypseManager().reload();
 			if (configManager.isValid()) configManager.sendMessage(sender, Message.RELOAD_SUCCESS, null);
@@ -99,7 +100,7 @@ public class ApocalypseCommand implements CommandExecutor, TabCompleter {
 					return true;
 				}
 			}
-			result = manager.startApocalypse(worldName, endTime);
+			result = manager.startApocalypse(worldName, endTime, true);
 		}else {
 			result = manager.endApocalypse(worldName, true);
 		}
@@ -134,7 +135,7 @@ public class ApocalypseCommand implements CommandExecutor, TabCompleter {
 	}
 
 	public List<String> filter(List<String> original, String query){
-		return original.stream().filter(s -> s.startsWith(query)).collect(Collectors.toList());
+		return original.stream().filter(s -> s.startsWith(query.toLowerCase())).collect(Collectors.toList());
 	}
 
 }

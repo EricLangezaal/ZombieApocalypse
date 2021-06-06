@@ -35,11 +35,10 @@ public class ConfigurationManager {
 	public boolean blockDamage = true;
 	public boolean doBossBar = true;
 	public boolean bossBarFog = true;
+	public boolean removeZombiesOnEnd = true;
 	public boolean allowSleep = true;
 
 	private boolean isValid;
-	
-	private final Map<ZombieType, ZombieWrapper> zombieWrappers = new HashMap<>();
 	
 	public ConfigurationManager(ZombieApocalypse plugin){
 		this.plugin = plugin;
@@ -80,16 +79,15 @@ public class ConfigurationManager {
 		doBossBar = plugin.getConfig().getBoolean("do-bossbar");
 		bossBarFog = plugin.getConfig().getBoolean("bossbar-fog", true);
 		allowSleep = plugin.getConfig().getBoolean("allow-sleep");
+		removeZombiesOnEnd = plugin.getConfig().getBoolean("remove-zombies-after-apocalypse");
 
-		zombieWrappers.clear();
-		
 		ConfigurationSection section = plugin.getConfig().getConfigurationSection(ZOMBIES_PREFIX);
 		for (String zombie: section.getKeys(false)){
 			if (!section.getBoolean(zombie + ".enabled")) continue;
 			try {
 				ZombieType type = ZombieType.valueOf(zombie.toUpperCase());
 				ZombieWrapper wrapper = new ZombieWrapper(type, section.getConfigurationSection(zombie));
-				zombieWrappers.put(type, wrapper);
+				plugin.getZombieFactory().addZombieWrapper(wrapper);
 			} catch (IllegalArgumentException e){
 				Bukkit.getConsoleSender().sendMessage(ChatColor.BOLD + "" + ChatColor.RED + plugin.logPrefix + "Zombie type '" + zombie + "' doesn't exist and isn't loaded in.");
 			}
@@ -151,14 +149,6 @@ public class ConfigurationManager {
 		plugin.reloadConfig();
 		this.isValid = this.checkConfig();
 		if (isValid) this.loadConfig();
-	}
-
-	public List<ZombieType> getZombieTypes(){
-		return new ArrayList<>(zombieWrappers.keySet());
-	}
-
-	public ZombieWrapper getZombieWrapper(ZombieType type){
-		return zombieWrappers.getOrDefault(type, new ZombieWrapper(type));
 	}
 
 }

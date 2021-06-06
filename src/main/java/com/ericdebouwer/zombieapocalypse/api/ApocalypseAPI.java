@@ -38,7 +38,18 @@ public class ApocalypseAPI {
      * @return true if the apocalypse did start, false if it failed (already started, world folder does not exist)
      */
     public boolean startApocalypse(@Nonnull String worldName){
-        return this.startApocalypse(worldName, -1);
+        return this.startApocalypse(worldName, true);
+    }
+
+    /**
+     * Start the apocalypse <b>indefinitely</b> for a world.
+     *
+     * @param worldName the name of the world, this world does not have to be loaded.
+     * @param broadCastStart whether or not to message players about the start of the apocalypse
+     * @return true if the apocalypse did start, false if it failed (already started, world folder does not exist)
+     */
+    public boolean startApocalypse(@Nonnull String worldName, boolean broadCastStart){
+        return plugin.getApocalypseManager().startApocalypse(worldName, -1, broadCastStart);
     }
 
     /**
@@ -51,7 +62,7 @@ public class ApocalypseAPI {
     public boolean startApocalypse(@Nonnull String worldName, long durationMinutes){
         Validate.isTrue(durationMinutes > 0, "duration should be a positive amount of seconds!");
         return plugin.getApocalypseManager().startApocalypse(worldName,
-                java.time.Instant.now().getEpochSecond() + durationMinutes * 60);
+                java.time.Instant.now().getEpochSecond() + durationMinutes * 60, true);
     }
 
     /**
@@ -59,13 +70,12 @@ public class ApocalypseAPI {
      *
      * @param worldName the name of the world, this world does not have to be loaded.
      * @param durationMinutes the amount of <b>minutes</b> the apocalypse should last.
-     * @param mobCap the maximum amount of zombies per chunk, 70 by default
+     * @param mobCap the maximum amount of zombies per chunk, 70 by default, negative for global
      * @param broadCastStart whether or not to message players about the start of the apocalypse
      * @return true if the apocalypse did start, false if it failed (already started, world folder does not exist)
      */
     public boolean startApocalypse(@Nonnull String worldName, long durationMinutes, int mobCap, boolean broadCastStart){
         Validate.isTrue(durationMinutes > 0, "duration should be a positive amount of seconds!");
-        Validate.isTrue(mobCap > 0, "mobCap should be a positive number!");
 
         return plugin.getApocalypseManager().startApocalypse(worldName,
                 java.time.Instant.now().getEpochSecond() + durationMinutes * 60, mobCap, broadCastStart);
@@ -131,6 +141,16 @@ public class ApocalypseAPI {
      */
     public @Nonnull Zombie spawnZombie(@Nonnull Location location, @Nonnull ZombieType type){
         return plugin.getZombieFactory().spawnZombie(location, type, ZombieSpawnedEvent.SpawnReason.API);
+    }
+
+    /**
+     * Spawn a <b>random</b> custom zombie that <b>is enabled</b>.
+     *
+     * @param location where to spawn the zombie.
+     * @return an instance of {@link org.bukkit.entity.Zombie}, which can be modified.
+     */
+    public @Nonnull Zombie spawnZombie(@Nonnull Location location){
+        return plugin.getZombieFactory().spawnZombie(location, ZombieSpawnedEvent.SpawnReason.API);
     }
 
 }

@@ -4,13 +4,15 @@ author: ericdebouwer (3ricL)
 description: Add a zombie apocalypse to minecraft!
 website: https://www.spigotmc.org/resources/82106/
 api-version: 1.13
-version: 1.3.2
+version: 1.4
+softdepend:
+  - SilkSpawners
 commands:
    apocalypse:
        aliases: [apo]
        usage: "§6USAGE §r/<command> <start | end | reload | setlimit> §7[worldname] [duration | amount]"
    zombie:
-       usage: "§6USAGE §r/<command> <zombie_type>"
+       usage: "§6USAGE §r/<command> <egg | spawner> <zombie_type>"
        
 permissions:
    apocalypse.*:

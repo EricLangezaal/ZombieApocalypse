@@ -4,7 +4,6 @@ import com.ericdebouwer.zombieapocalypse.ZombieApocalypse;
 import com.ericdebouwer.zombieapocalypse.zombie.ZombieType;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.configuration.ConfigurationSection;
@@ -33,7 +32,7 @@ public class ZombieWrapper {
         this.type = type;
         if (section == null) return;
 
-        String textureUrl = section.getString(  "head", "");
+        String textureUrl = section.getString("head", "");
         head = getHead(textureUrl);
 
         ConfigurationSection attributeSection = section.getConfigurationSection("attributes");
@@ -45,6 +44,10 @@ public class ZombieWrapper {
                 JavaPlugin.getPlugin(ZombieApocalypse.class).getLogger().info("Attribute " + attribute + " does not exist!");
             }
         }
+    }
+
+    public ZombieType getType() {
+        return this.type;
     }
 
     public Zombie apply(Zombie zombie){

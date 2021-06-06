@@ -36,8 +36,8 @@ public enum ZombieType {
 		return null;
 	}
 
-	public static Zombie set(Zombie zombie, ZombieType zombieType){
-		String type = ZOMBIE_IDENTIFIER + zombieType.toString();
+	public Zombie set(Zombie zombie){
+		String type = ZOMBIE_IDENTIFIER + this.toString();
 		zombie.getScoreboardTags().add(type);
 		return zombie;
 	}

@@ -13,7 +13,7 @@ public enum Message {
 	NO_PERMISSION ("no-command-permission"),
 	RELOAD_SUCCESS ("reload-success"),
 	RELOAD_FAIL("reload-fail"),
-	EGG_GIVEN ("given-zombie-egg"),
+	ITEM_GIVEN ("given-zombie-egg"),
 	INVALID_ZOMBIE ("invalid-egg-type"),
 	BOSS_BAR_TITLE ("apocalypse-boss-bar-title"),
 	NO_SLEEP ("no-apocalypse-sleep"),

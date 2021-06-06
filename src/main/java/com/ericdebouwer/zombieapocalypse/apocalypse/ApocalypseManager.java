@@ -109,11 +109,13 @@ public class ApocalypseManager {
 	public boolean isApocalypse(String worldName){
 		return this.getApoWorld(worldName).isPresent();
 	}
-	
-	public boolean startApocalypse(String worldName, long endTime){
-		return this.startApocalypse(worldName, endTime, Bukkit.getMonsterSpawnLimit(), true);
+
+	public boolean startApocalypse(String worldName, long endTime, boolean broadCast){
+		World world = Bukkit.getWorld(worldName);
+		int mobCap = world == null ? Bukkit.getMonsterSpawnLimit() : world.getMonsterSpawnLimit();
+		return this.startApocalypse(worldName, endTime, mobCap, broadCast);
 	}
-	
+
 	public boolean startApocalypse(String worldName, long endTime, int mobCap, boolean broadCast){
 		if (isApocalypse(worldName)) return false;
 		File potentialWorld = new File(Bukkit.getServer().getWorldContainer(), worldName);
@@ -170,9 +172,11 @@ public class ApocalypseManager {
 			apoWorld.get().removePlayer(player);
 			if (broadCast) plugin.getConfigManager().sendMessage(player, Message.END_BROADCAST, ImmutableMap.of("world_name", worldName));
 		}
-		
-		for (Zombie zombie: world.getEntitiesByClass(Zombie.class)){
-			zombie.remove();
+
+		if (plugin.getConfigManager().removeZombiesOnEnd) {
+			for (Zombie zombie: world.getEntitiesByClass(Zombie.class)){
+				zombie.remove();
+			}
 		}
 		return true;
 	}

@@ -6,39 +6,51 @@ import com.ericdebouwer.zombieapocalypse.api.ZombieSpawnedEvent;
 import com.ericdebouwer.zombieapocalypse.config.ZombieWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.PigZombie;
-import org.bukkit.entity.Zombie;
+import org.bukkit.entity.*;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.util.Consumer;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class ZombieFactory {
 
     private final ZombieApocalypse plugin;
+    private final Map<ZombieType, ZombieWrapper> zombieWrappers = new HashMap<>();
 
     public ZombieFactory(ZombieApocalypse plugin){
         this.plugin = plugin;
     }
 
-    // only invoked for regular apocalypse zombies
-    public void spawnZombie(Location loc){
-        List<ZombieType> types = plugin.getConfigManager().getZombieTypes();
-        if (types.isEmpty()) types = Arrays.asList(ZombieType.values());
-        ZombieType randomType = types.get(ThreadLocalRandom.current().nextInt(types.size()));
+    public void reload() {
+        zombieWrappers.clear();
+    }
 
-        ZombiePreSpawnEvent preSpawnEvent = new ZombiePreSpawnEvent(loc, randomType);
+    public void addZombieWrapper(ZombieWrapper wrapper){
+        zombieWrappers.put(wrapper.getType(), wrapper);
+    }
+
+    private ZombieType getRandomZombieType(){
+        List<ZombieType> types = new ArrayList<>(zombieWrappers.keySet());
+        if (types.isEmpty()) types = Arrays.asList(ZombieType.values());
+        return types.get(ThreadLocalRandom.current().nextInt(types.size()));
+    }
+
+    // only invoked for regular apocalypse zombies
+    public void spawnApocalypseZombie(Location loc){
+        ZombiePreSpawnEvent preSpawnEvent = new ZombiePreSpawnEvent(loc, getRandomZombieType());
         Bukkit.getServer().getPluginManager().callEvent(preSpawnEvent);
 
         if (!preSpawnEvent.isCancelled()){
             this.spawnZombie(loc, preSpawnEvent.getType(), ZombieSpawnedEvent.SpawnReason.APOCALYPSE);
         }
+    }
+
+    public Zombie spawnZombie(Location loc, ZombieSpawnedEvent.SpawnReason reason){
+        return this.spawnZombie(loc, getRandomZombieType(), reason);
     }
 
     public Zombie spawnZombie(Location loc, ZombieType type, ZombieSpawnedEvent.SpawnReason reason){
@@ -48,7 +60,7 @@ public class ZombieFactory {
             zombie.getVehicle().remove();
         }
 
-        ZombieWrapper wrapper = plugin.getConfigManager().getZombieWrapper(type);
+        ZombieWrapper wrapper = zombieWrappers.getOrDefault(type, new ZombieWrapper(type));
         zombie = wrapper.apply(zombie);
 
         if (!plugin.getConfigManager().doBabies)
@@ -80,14 +92,17 @@ public class ZombieFactory {
         boolean isNether = loc.getWorld().getEnvironment() == World.Environment.NETHER;
         Class environmentType = (isNether && plugin.getConfigManager().doNetherPigmen) ? PigZombie.class : Zombie.class;
 
-        Consumer<Zombie> action = zomb -> ZombieType.set(zomb, type);
+        if (loc.getBlock().getType() == Material.WATER){
+            environmentType = Drowned.class;
+        }
+
         Zombie zombie;
         if (plugin.isPaperMC){
             // as Paper ignores all other spawns in mob cap
-            zombie = loc.getWorld().spawn(loc, environmentType , action, CreatureSpawnEvent.SpawnReason.NATURAL);
+            zombie = loc.getWorld().spawn(loc, environmentType, type::set, CreatureSpawnEvent.SpawnReason.NATURAL);
         }
         else {
-            zombie = loc.getWorld().spawn(loc, environmentType, action);
+            zombie = loc.getWorld().spawn(loc, environmentType, type::set);
         }
 
         if (zombie.getType() == EntityType.ZOMBIE && isNether){

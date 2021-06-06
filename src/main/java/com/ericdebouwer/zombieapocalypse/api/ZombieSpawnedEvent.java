@@ -44,7 +44,7 @@ public class ZombieSpawnedEvent extends Event {
      *
      * @return an instance of {@link SpawnReason}
      */
-    public @Nonnull SpawnReason getSpawnReason(){ return reason; }
+    public @Nonnull SpawnReason getSpawnReason() { return reason; }
 
 
     /**
@@ -61,7 +61,7 @@ public class ZombieSpawnedEvent extends Event {
      *
      * @return an instance of {@link org.bukkit.entity.Zombie}
      */
-    public @Nonnull Zombie getZombie(){ return zombie;}
+    public @Nonnull Zombie getZombie() { return zombie;}
 
     public HandlerList getHandlers() {
         return handlers;
@@ -89,6 +89,10 @@ public class ZombieSpawnedEvent extends Event {
          * When a zombie spawns due to a custom spawn egg being used.
          */
         SPAWN_EGG,
+        /**
+         * When a zombie spawns from a custom spawner.
+         */
+        CUSTOM_SPAWNER,
         /**
          * When a zombie spawns due to a plugin (yours potentially) using this API
          */

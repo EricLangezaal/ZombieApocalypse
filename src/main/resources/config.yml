@@ -76,6 +76,9 @@ do-zombie-block-damage: true
 # by default those will be zombified pigmen/piglins instead
 spawn-pigmen-in-nether: true
 
+# whether or not my plugin will remove all custom zombies from an apocalypse world after the apocalypse has ended
+remove-zombies-after-apocalypse: true
+
 # whether players can sleep when there is an apocalypse ongoing
 allow-sleep: true
 
@@ -122,8 +125,11 @@ messages:
    # sent when a player tries to sleep and `allow-sleep` (see above) is set to false.
    no-apocalypse-sleep: "§7That would be a little too easy..."
 
+   # also used when a custom spawner is given!
    # given-zombie-egg supports placeholder {item_name} for the name of the egg just received
    given-zombie-egg: "§7You have been given a §r§6{item_name}"
+
+   # also used when a custom spawner type is incorrect!
    # invalid-egg-type supports placeholder {input} for the users faulty zombie type input
    invalid-egg-type: "§cThat zombie type doesn't exist!"
   
