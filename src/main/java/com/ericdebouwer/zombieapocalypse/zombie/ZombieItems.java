@@ -46,7 +46,7 @@ public class ZombieItems {
         if (container == null) return null;
         try {
             return ZombieType.valueOf(container.getPersistentDataContainer().get(zombieTypeKey, PersistentDataType.STRING));
-        } catch (IllegalArgumentException | NullPointerException ila){
+        } catch (IllegalArgumentException | NullPointerException ex){
             return null;
         }
     }
