@@ -13,6 +13,7 @@ import com.ericdebouwer.zombieapocalypse.zombie.ZombieFactory;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Consumer;
 
@@ -63,7 +64,9 @@ public class ZombieApocalypse extends JavaPlugin {
 		getServer().getPluginManager().registerEvents(new ZombieListener(this), this);
 		getServer().getPluginManager().registerEvents(new ApocalypseListener(this), this);
 
-		if (getServer().getPluginManager().getPlugin("SilkSpawners") != null){
+
+		Plugin silkSpawnerPlugin = getServer().getPluginManager().getPlugin("SilkSpawners");
+		if (silkSpawnerPlugin != null && silkSpawnerPlugin.isEnabled()){
 			getLogger().info("SilkSpawners detected! Making our spawners comply with it");
 			zombieItems = new SilkZombieItems(this);
 			getServer().getPluginManager().registerEvents(new SpawnerBreakListener(this), this);

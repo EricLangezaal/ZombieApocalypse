@@ -1,10 +1,10 @@
 name: ZombieApocalypse
 main: com.ericdebouwer.zombieapocalypse.ZombieApocalypse
-author: ericdebouwer (3ricL)
+author: Ericdebouwer (3ricL)
 description: Add a zombie apocalypse to minecraft!
 website: https://www.spigotmc.org/resources/82106/
 api-version: 1.13
-version: 1.4
+version: 1.4.2
 softdepend:
   - SilkSpawners
 commands:

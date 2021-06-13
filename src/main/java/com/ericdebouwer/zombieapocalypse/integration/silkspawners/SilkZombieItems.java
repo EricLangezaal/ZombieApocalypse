@@ -20,7 +20,7 @@ public class SilkZombieItems extends ZombieItems {
     public ItemStack getSpawner(ZombieType type){
         SilkUtil silkUtil = SilkUtil.hookIntoSilkSpanwers();
         ItemStack spawner = silkUtil.newSpawnerItem("zombie",
-                ChatColor.RESET + WordUtils.capitalizeFully(type.toString()) + " Zombie Spawner",
+                ChatColor.RESET + "" + ChatColor.WHITE + WordUtils.capitalizeFully(type.toString()) + " Zombie Spawner",
                 1, false);
 
         ItemMeta meta = spawner.getItemMeta();

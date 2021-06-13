@@ -8,10 +8,7 @@ import com.ericdebouwer.zombieapocalypse.ZombieApocalypse;
 import com.ericdebouwer.zombieapocalypse.api.ZombieSpawnedEvent;
 import org.bukkit.*;
 import org.bukkit.block.CreatureSpawner;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Monster;
-import org.bukkit.entity.Zombie;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -100,7 +97,7 @@ public class ZombieListener implements Listener {
 		ZombieType type = plugin.getZombieItems().getZombieType(event.getSpawner());
 		if (type == null) return;
 
-		event.setCancelled(true);
+		event.getEntity().remove(); //cancelling will make it respawn too quickly
 		plugin.getZombieFactory().spawnZombie(event.getLocation(), type, ZombieSpawnedEvent.SpawnReason.CUSTOM_SPAWNER);
 	}
 

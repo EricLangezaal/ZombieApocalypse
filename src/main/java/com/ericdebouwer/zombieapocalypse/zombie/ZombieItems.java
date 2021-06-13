@@ -29,7 +29,7 @@ public class ZombieItems {
         ItemMeta meta = zombieItem.getItemMeta();
         meta.getPersistentDataContainer().set(zombieTypeKey, PersistentDataType.STRING, type.toString());
         String itemName = WordUtils.capitalizeFully(type.toString()) + name;
-        meta.setDisplayName(ChatColor.RESET + itemName);
+        meta.setDisplayName(ChatColor.RESET + "" + ChatColor.WHITE + itemName);
         zombieItem.setItemMeta(meta);
         return zombieItem;
     }
