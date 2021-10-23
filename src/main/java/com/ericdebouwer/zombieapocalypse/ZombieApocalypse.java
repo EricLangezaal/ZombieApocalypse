@@ -55,7 +55,7 @@ public class ZombieApocalypse extends JavaPlugin {
 		this.getCommand("zombie").setTabCompleter(zombieCommand);
 		
 		try {
-			Class.forName("org.bukkit.World").getDeclaredMethod("spawn", Location.class, Class.class, Consumer.class, CreatureSpawnEvent.SpawnReason.class);
+			Class.forName("org.bukkit.World").getMethod("spawn", Location.class, Class.class, CreatureSpawnEvent.SpawnReason.class, Consumer.class);
 		    isPaperMC = true;
 		    getLogger().info("PaperMC detected! Changing spawning algorithm accordingly");
 		} catch (ClassNotFoundException | NoSuchMethodException ignore) {
