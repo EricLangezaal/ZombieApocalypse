@@ -4,6 +4,7 @@ import com.ericdebouwer.zombieapocalypse.ZombieApocalypse;
 import com.ericdebouwer.zombieapocalypse.zombie.ZombieType;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.configuration.ConfigurationSection;
@@ -21,6 +22,7 @@ import java.util.UUID;
 public class ZombieWrapper {
 
     private ItemStack head;
+    @Getter
     private final ZombieType type;
     public Map<Attribute, Double> attributes = new HashMap<>();
 
@@ -44,10 +46,6 @@ public class ZombieWrapper {
                 JavaPlugin.getPlugin(ZombieApocalypse.class).getLogger().info("Attribute " + attribute + " does not exist!");
             }
         }
-    }
-
-    public ZombieType getType() {
-        return this.type;
     }
 
     public Zombie apply(Zombie zombie){

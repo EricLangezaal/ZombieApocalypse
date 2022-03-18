@@ -66,8 +66,10 @@ allow-babies: true
 # zombies with custom heads will never burn, should the ones without burn in the day?
 burn-in-day: false
 
-# whether or not the bossbar appears for players inside an apocalypse
+# whether the bossbar appears for players inside an apocalypse
 do-bossbar: true
+# whether the bossbar will have a fog effect, might not work on some versions
+bossbar-fog: true
 
 # if zombies (currently only boomer) should do block damage
 do-zombie-block-damage: true

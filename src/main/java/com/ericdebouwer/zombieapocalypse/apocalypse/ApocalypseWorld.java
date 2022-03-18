@@ -3,6 +3,8 @@ package com.ericdebouwer.zombieapocalypse.apocalypse;
 import com.ericdebouwer.zombieapocalypse.ZombieApocalypse;
 import com.ericdebouwer.zombieapocalypse.api.Apocalypse;
 import com.ericdebouwer.zombieapocalypse.config.Message;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.boss.BarColor;
@@ -18,18 +20,21 @@ import java.util.List;
 public class ApocalypseWorld implements Apocalypse {
 
 	public String worldName;
-	public long endTime;
+	@Getter
+	public long endEpochSecond;
+	@Getter
 	public BossBar bossBar;
+	@Getter @Setter
 	public int mobCap;
 
 	private BukkitTask barCountDown;
 
-	private ZombieApocalypse plugin;
+	private final ZombieApocalypse plugin;
 	
 	public ApocalypseWorld(ZombieApocalypse plugin, String worldName, long endTime, int mobCap){
 		this.plugin = plugin;
 		this.worldName = worldName;
-		this.endTime = endTime;
+		this.endEpochSecond = endTime;
 		this.mobCap = mobCap;
 		loadBossBar(1.0);
 	}
@@ -49,50 +54,28 @@ public class ApocalypseWorld implements Apocalypse {
 				worldName.replaceAll("[^a-zA-Z0-9/._-]", ""));
 
 		String barTitle = plugin.getConfigManager().getString(Message.BOSS_BAR_TITLE);
-
-		if (plugin.getConfigManager().bossBarFog){
-			this.bossBar = plugin.getServer().createBossBar(nameKey, barTitle, BarColor.PURPLE, BarStyle.SOLID, BarFlag.CREATE_FOG);
-		}else {
-			this.bossBar = plugin.getServer().createBossBar(nameKey, barTitle, BarColor.PURPLE, BarStyle.SOLID);
+		this.bossBar = plugin.getServer().createBossBar(nameKey, barTitle, BarColor.PURPLE, BarStyle.SOLID);
+		if (plugin.getConfigManager().isBossBarFog()) {
+			this.bossBar.addFlag(BarFlag.CREATE_FOG);
 		}
-
 		this.bossBar.setProgress(oldProgress);
-		this.bossBar.setVisible(plugin.getConfigManager().doBossBar);
-	}
-	
-	public void setMobCap(int mobCap){
-		this.mobCap = mobCap;
-	}
-
-	@Nonnull @Override
-	public BossBar getBossBar() {
-		return bossBar;
+		this.bossBar.setVisible(plugin.getConfigManager().doBossBar());
 	}
 
 	@Override
-	public void addPlayer(Player player){
+	public void addPlayer(@Nonnull Player player){
 		bossBar.addPlayer(player);
 	}
 
 	@Override
-	public void removePlayer(Player player){
+	public void removePlayer(@Nonnull Player player){
 		bossBar.removePlayer(player);
-	}
-
-	@Override
-	public int getMobCap() {
-		return mobCap;
-	}
-
-	@Override
-	public long getEndEpochSecond() {
-		return endTime;
 	}
 
 	public void startCountDown(){
 		final double STEPS = 120D;
 		long now = java.time.Instant.now().getEpochSecond();
-		int period = (int) Math.ceil((this.endTime - now) / STEPS * 20D);
+		int period = (int) Math.ceil((this.endEpochSecond - now) / STEPS * 20D);
 
 		barCountDown = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
 			double progress = bossBar.getProgress() - 1D / STEPS;

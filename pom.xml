@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.ericdebouwer</groupId>
   <artifactId>ZombieApocalypse</artifactId>
-  <version>1.4.3</version>
+  <version>1.4.4</version>
   <repositories>
         <repository>
            <id>papermc</id>
@@ -47,6 +47,12 @@
                    <artifactId>*</artifactId>
                </exclusion>
            </exclusions>
+       </dependency>
+       <dependency>
+           <groupId>org.projectlombok</groupId>
+           <artifactId>lombok</artifactId>
+           <version>1.18.20</version>
+           <scope>provided</scope>
        </dependency>
     </dependencies>
 

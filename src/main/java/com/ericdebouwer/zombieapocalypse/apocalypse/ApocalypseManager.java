@@ -1,15 +1,8 @@
 package com.ericdebouwer.zombieapocalypse.apocalypse;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import com.ericdebouwer.zombieapocalypse.ZombieApocalypse;
 import com.ericdebouwer.zombieapocalypse.config.Message;
+import com.google.common.collect.ImmutableMap;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -17,13 +10,15 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Zombie;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.player.PlayerChangedWorldEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.scheduler.BukkitTask;
 
-import com.google.common.collect.ImmutableMap;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public class ApocalypseManager {
 
@@ -66,7 +61,7 @@ public class ApocalypseManager {
 			
 		} catch (IOException e) {
 			e.printStackTrace();
-			Bukkit.getConsoleSender().sendMessage(ChatColor.RED + plugin.logPrefix + "Failed to load apocalypse data! Removed 'apocalypse.yml' and restart the server!");
+			Bukkit.getConsoleSender().sendMessage(ChatColor.RED + plugin.getLogPrefix() + "Failed to load apocalypse data! Removed 'apocalypse.yml' and restart the server!");
 		}
 	}
 	
@@ -74,7 +69,7 @@ public class ApocalypseManager {
 	private void saveConfig(){
 		try{
 			for (ApocalypseWorld world: apocalypseWorlds){
-				apoConfig.set(world.worldName + UNTIL_KEY, world.endTime);
+				apoConfig.set(world.worldName + UNTIL_KEY, world.endEpochSecond);
 				apoConfig.set(world.worldName + MOB_CAP_KEY, world.mobCap);
 			}
 			this.apoConfig.save(apoFile);
@@ -157,7 +152,7 @@ public class ApocalypseManager {
 		if (!apoWorld.isPresent()) return false;
 
 		apocalypseWorlds.remove(apoWorld.get());
-		apoEnders.remove(worldName);
+		Optional.ofNullable(apoEnders.remove(worldName)).ifPresent(BukkitTask::cancel);
 		apoConfig.set(worldName, null);
 		apoWorld.get().endCountDown();
 
@@ -173,7 +168,7 @@ public class ApocalypseManager {
 			if (broadCast) plugin.getConfigManager().sendMessage(player, Message.END_BROADCAST, ImmutableMap.of("world_name", worldName));
 		}
 
-		if (plugin.getConfigManager().removeZombiesOnEnd) {
+		if (plugin.getConfigManager().isRemoveZombiesOnEnd()) {
 			for (Zombie zombie: world.getEntitiesByClass(Zombie.class)){
 				zombie.remove();
 			}

@@ -63,7 +63,7 @@ public class ZombieFactory {
         ZombieWrapper wrapper = zombieWrappers.getOrDefault(type, new ZombieWrapper(type));
         zombie = wrapper.apply(zombie);
 
-        if (!plugin.getConfigManager().doBabies)
+        if (!plugin.getConfigManager().doBabies())
             zombie.setBaby(false);
 
         if (type == ZombieType.JUMPER){
@@ -90,14 +90,14 @@ public class ZombieFactory {
     @SuppressWarnings({ "unchecked", "rawtypes"})
     private Zombie spawnForEnvironment(Location loc, ZombieType type){
         boolean isNether = loc.getWorld().getEnvironment() == World.Environment.NETHER;
-        Class environmentType = (isNether && plugin.getConfigManager().doNetherPigmen) ? PigZombie.class : Zombie.class;
+        Class environmentType = (isNether && plugin.getConfigManager().doNetherPigmen()) ? PigZombie.class : Zombie.class;
 
         if (loc.getBlock().getType() == Material.WATER){
             environmentType = Drowned.class;
         }
 
         Zombie zombie;
-        if (plugin.isPaperMC){
+        if (plugin.isPaperMC()){
             // as Paper ignores all other spawns in mob cap
             zombie = loc.getWorld().spawn(loc, environmentType, CreatureSpawnEvent.SpawnReason.NATURAL, type::set);
         }

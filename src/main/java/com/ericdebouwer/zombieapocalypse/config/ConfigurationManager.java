@@ -1,17 +1,11 @@
 package com.ericdebouwer.zombieapocalypse.config;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.ericdebouwer.zombieapocalypse.ZombieApocalypse;
 import com.ericdebouwer.zombieapocalypse.zombie.ZombieType;
+import com.google.common.collect.ImmutableMap;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.experimental.Accessors;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -19,25 +13,37 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-import com.google.common.collect.ImmutableMap;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Arrays;
+import java.util.Map;
 
+@Getter
 public class ConfigurationManager {
 
-	ZombieApocalypse plugin;
+	@Getter(AccessLevel.NONE)
+	private final ZombieApocalypse plugin;
+	@Getter(AccessLevel.NONE)
 	private final String MESSAGES_PREFIX = "messages.";
+	@Getter(AccessLevel.NONE)
 	private final String ZOMBIES_PREFIX = "zombies.";
-	
-	public String pluginPrefix;
-	public boolean checkUpdates = true;
-	public boolean doBabies = true;
-	public boolean doNetherPigmen = true;
-	public boolean burnInDay = true;
-	public boolean blockDamage = true;
-	public boolean doBossBar = true;
-	public boolean bossBarFog = true;
-	public boolean removeZombiesOnEnd = true;
-	public boolean allowSleep = true;
+	@Getter(AccessLevel.NONE)
+	private String pluginPrefix;
 
+	private boolean checkUpdates;
+	@Accessors(fluent=true)
+	private boolean doBabies;
+	@Accessors(fluent=true)
+	private boolean doNetherPigmen;
+	private boolean burnInDay;
+	private boolean blockDamage;
+	@Accessors(fluent=true)
+	private boolean doBossBar;
+	private boolean bossBarFog;
+	private boolean removeZombiesOnEnd;
+	private boolean allowSleep;
 	private boolean isValid;
 	
 	public ConfigurationManager(ZombieApocalypse plugin){
@@ -47,11 +53,7 @@ public class ConfigurationManager {
 		this.isValid = this.checkConfig();
 		if (isValid) this.loadConfig();
 	}
-	
-	public boolean isValid(){
-		return this.isValid;
-	}
-	
+
 	private boolean checkConfig(){
 		boolean valid = this.validateConfig(true);
 		if (!valid){
@@ -64,22 +66,22 @@ public class ConfigurationManager {
 		        	return true;
 				}
 			}
-			Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.RED + plugin.logPrefix + "Automatic configuration update failed! You can delete the old 'config.yml' to get a new one.");
+			Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.RED + plugin.getLogPrefix() + "Automatic configuration update failed! You can delete the old 'config.yml' to get a new one.");
 		}
 		return valid;
 	}
 	
 	public void loadConfig(){
 		pluginPrefix = plugin.getConfig().getString("plugin-prefix");
-		checkUpdates = plugin.getConfig().getBoolean("check-for-updates");
-		doBabies = plugin.getConfig().getBoolean("allow-babies");
-		doNetherPigmen = plugin.getConfig().getBoolean("spawn-pigmen-in-nether");
-		burnInDay = plugin.getConfig().getBoolean("burn-in-day");
-		blockDamage = plugin.getConfig().getBoolean("do-zombie-block-damage");
-		doBossBar = plugin.getConfig().getBoolean("do-bossbar");
+		checkUpdates = plugin.getConfig().getBoolean("check-for-updates", true);
+		doBabies = plugin.getConfig().getBoolean("allow-babies", true);
+		doNetherPigmen = plugin.getConfig().getBoolean("spawn-pigmen-in-nether", true);
+		burnInDay = plugin.getConfig().getBoolean("burn-in-day", true);
+		blockDamage = plugin.getConfig().getBoolean("do-zombie-block-damage", true);
+		doBossBar = plugin.getConfig().getBoolean("do-bossbar", true);
 		bossBarFog = plugin.getConfig().getBoolean("bossbar-fog", true);
-		allowSleep = plugin.getConfig().getBoolean("allow-sleep");
-		removeZombiesOnEnd = plugin.getConfig().getBoolean("remove-zombies-after-apocalypse");
+		allowSleep = plugin.getConfig().getBoolean("allow-sleep", true);
+		removeZombiesOnEnd = plugin.getConfig().getBoolean("remove-zombies-after-apocalypse", true);
 
 		ConfigurationSection section = plugin.getConfig().getConfigurationSection(ZOMBIES_PREFIX);
 		for (String zombie: section.getKeys(false)){
@@ -89,7 +91,7 @@ public class ConfigurationManager {
 				ZombieWrapper wrapper = new ZombieWrapper(type, section.getConfigurationSection(zombie));
 				plugin.getZombieFactory().addZombieWrapper(wrapper);
 			} catch (IllegalArgumentException e){
-				Bukkit.getConsoleSender().sendMessage(ChatColor.BOLD + "" + ChatColor.RED + plugin.logPrefix + "Zombie type '" + zombie + "' doesn't exist and isn't loaded in.");
+				Bukkit.getConsoleSender().sendMessage(ChatColor.BOLD + "" + ChatColor.RED + plugin.getLogPrefix() + "Zombie type '" + zombie + "' doesn't exist and isn't loaded in.");
 			}
 		}
 	}

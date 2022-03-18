@@ -1,6 +1,7 @@
 package com.ericdebouwer.zombieapocalypse.zombie;
 
 import com.ericdebouwer.zombieapocalypse.ZombieApocalypse;
+import lombok.Getter;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -14,20 +15,17 @@ import javax.annotation.Nullable;
 
 public class ZombieItems {
 
-    private final NamespacedKey zombieTypeKey;
+    @Getter
+    private final NamespacedKey key;
 
     public ZombieItems(ZombieApocalypse plugin){
-        zombieTypeKey = new NamespacedKey(plugin, "ZombieType");
-    }
-
-    public NamespacedKey getKey() {
-        return this.zombieTypeKey;
+        key = new NamespacedKey(plugin, "ZombieType");
     }
 
     protected ItemStack createZombieItem(String name, Material mat, ZombieType type){
         ItemStack zombieItem = new ItemStack(mat);
         ItemMeta meta = zombieItem.getItemMeta();
-        meta.getPersistentDataContainer().set(zombieTypeKey, PersistentDataType.STRING, type.toString());
+        meta.getPersistentDataContainer().set(key, PersistentDataType.STRING, type.toString());
         String itemName = WordUtils.capitalizeFully(type.toString()) + name;
         meta.setDisplayName(ChatColor.RESET + "" + ChatColor.WHITE + itemName);
         zombieItem.setItemMeta(meta);
@@ -45,7 +43,7 @@ public class ZombieItems {
     public @Nullable ZombieType getZombieType(PersistentDataHolder container){
         if (container == null) return null;
         try {
-            return ZombieType.valueOf(container.getPersistentDataContainer().get(zombieTypeKey, PersistentDataType.STRING));
+            return ZombieType.valueOf(container.getPersistentDataContainer().get(key, PersistentDataType.STRING));
         } catch (IllegalArgumentException | NullPointerException ex){
             return null;
         }

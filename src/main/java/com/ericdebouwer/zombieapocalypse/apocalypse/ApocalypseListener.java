@@ -8,6 +8,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 
 import java.util.Optional;
@@ -23,30 +24,36 @@ public class ApocalypseListener implements Listener {
     }
 
     @EventHandler
-    public void worldLoad(WorldLoadEvent e){
-        Optional<ApocalypseWorld> apoWorld = manager.getApoWorld(e.getWorld().getName());
+    public void worldLoad(WorldLoadEvent event){
+        Optional<ApocalypseWorld> apoWorld = manager.getApoWorld(event.getWorld().getName());
         if (!apoWorld.isPresent()) return;
-        e.getWorld().setMonsterSpawnLimit(apoWorld.get().mobCap);
+        event.getWorld().setMonsterSpawnLimit(apoWorld.get().mobCap);
     }
 
     @EventHandler
-    public void worldSwitch(PlayerChangedWorldEvent e){
-        Optional<ApocalypseWorld> apoFrom = manager.getApoWorld(e.getFrom().getName());
-        apoFrom.ifPresent(aw -> aw.removePlayer(e.getPlayer()));
+    public void worldSwitch(PlayerChangedWorldEvent event){
+        Optional<ApocalypseWorld> apoFrom = manager.getApoWorld(event.getFrom().getName());
+        apoFrom.ifPresent(aw -> aw.removePlayer(event.getPlayer()));
 
-        Optional<ApocalypseWorld> apoTo = manager.getApoWorld(e.getPlayer().getWorld().getName());
-        apoTo.ifPresent(aw -> aw.addPlayer(e.getPlayer()));
+        Optional<ApocalypseWorld> apoTo = manager.getApoWorld(event.getPlayer().getWorld().getName());
+        apoTo.ifPresent(aw -> aw.addPlayer(event.getPlayer()));
     }
 
     @EventHandler
-    public void newPlayerJoin(PlayerJoinEvent e){
-        Optional<ApocalypseWorld> apoWorld = manager.getApoWorld(e.getPlayer().getWorld().getName());
-        apoWorld.ifPresent(aw -> aw.addPlayer(e.getPlayer()));
+    public void newPlayerJoin(PlayerJoinEvent event){
+        Optional<ApocalypseWorld> apoWorld = manager.getApoWorld(event.getPlayer().getWorld().getName());
+        apoWorld.ifPresent(aw -> aw.addPlayer(event.getPlayer()));
+    }
+
+    @EventHandler
+    public void playerLeave(PlayerQuitEvent event){
+        Optional<ApocalypseWorld> apoWorld = manager.getApoWorld(event.getPlayer().getWorld().getName());
+        apoWorld.ifPresent(aw -> aw.removePlayer(event.getPlayer()));
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     private void onSleep(PlayerBedEnterEvent event){
-        if (plugin.getConfigManager().allowSleep) return;
+        if (plugin.getConfigManager().isAllowSleep()) return;
         if (!manager.isApocalypse(event.getPlayer().getWorld().getName())) return;
 
         plugin.getConfigManager().sendMessage(event.getPlayer(), Message.NO_SLEEP, null);

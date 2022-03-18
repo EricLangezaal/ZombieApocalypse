@@ -32,29 +32,29 @@ public class ZombieListener implements Listener {
 	}
 	
 	@EventHandler
-	private void onMobSpawn(CreatureSpawnEvent e){
-		if (!(plugin.getApocalypseManager().isApocalypse(e.getLocation().getWorld().getName()))) return;
-		if (!(e.getEntity() instanceof Monster)) return;
-		if (ignoreReasons.contains(e.getSpawnReason())) return;
+	private void onMobSpawn(CreatureSpawnEvent event){
+		if (!(plugin.getApocalypseManager().isApocalypse(event.getLocation().getWorld().getName()))) return;
+		if (!(event.getEntity() instanceof Monster)) return;
+		if (ignoreReasons.contains(event.getSpawnReason())) return;
 
-		if (e.getEntity() instanceof Zombie && ZombieType.getType((Zombie) e.getEntity()) != null) return;
-		if (e.getEntity().hasMetadata("ignoreZombie")) return;
+		if (event.getEntity() instanceof Zombie && ZombieType.getType((Zombie) event.getEntity()) != null) return;
+		if (event.getEntity().hasMetadata("ignoreZombie")) return;
 
-		e.setCancelled(true);
-		plugin.getZombieFactory().spawnApocalypseZombie(e.getLocation());
+		event.setCancelled(true);
+		plugin.getZombieFactory().spawnApocalypseZombie(event.getLocation());
 	}
 	
 	@EventHandler
-	private void onDeath(EntityDeathEvent e){
-		if (!(e.getEntity() instanceof Zombie)) return;
-		Zombie zombie = (Zombie) e.getEntity();
+	private void onDeath(EntityDeathEvent event){
+		if (!(event.getEntity() instanceof Zombie)) return;
+		Zombie zombie = (Zombie) event.getEntity();
 		
-		e.getDrops().removeIf(i -> i.getType() == Material.PLAYER_HEAD);
+		event.getDrops().removeIf(i -> i.getType() == Material.PLAYER_HEAD);
 		
 		ZombieType type = ZombieType.getType(zombie);
 		if (type == ZombieType.BOOMER){
-			e.getEntity().getWorld().createExplosion(e.getEntity().getLocation(), 3f, false,
-					plugin.getConfigManager().blockDamage, zombie);
+			event.getEntity().getWorld().createExplosion(event.getEntity().getLocation(), 3f, false,
+					plugin.getConfigManager().isBlockDamage(), zombie);
 		}
 		else if (type == ZombieType.MULTIPLIER){
 			int zombieAmount = ThreadLocalRandom.current().nextInt(5);
@@ -62,30 +62,30 @@ public class ZombieListener implements Listener {
 			for (int i = 0; i <= zombieAmount; i++){
 				double xOffset = ThreadLocalRandom.current().nextDouble() * 2 - 1;
 				double zOffset = ThreadLocalRandom.current().nextDouble() * 2 - 1;
-				plugin.getZombieFactory().spawnZombie(e.getEntity().getLocation().add(xOffset,0, zOffset),
+				plugin.getZombieFactory().spawnZombie(event.getEntity().getLocation().add(xOffset,0, zOffset),
 						ZombieType.DEFAULT, ZombieSpawnedEvent.SpawnReason.ZOMBIE_EFFECT);
 			}
 		}
 	}
 	
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-	private void throwerHit(final EntityDamageByEntityEvent e){
-		if (!(e.getDamager() instanceof Zombie)) return;
-		if (!(e.getEntity() instanceof LivingEntity)) return;
-		Zombie zombie = (Zombie) e.getDamager();
+	private void throwerHit(final EntityDamageByEntityEvent event){
+		if (!(event.getDamager() instanceof Zombie)) return;
+		if (!(event.getEntity() instanceof LivingEntity)) return;
+		Zombie zombie = (Zombie) event.getDamager();
 		ZombieType type = ZombieType.getType(zombie);
 		
 		if (type == ZombieType.THROWER){
 			Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
-				Vector newSpeed = e.getDamager().getLocation().getDirection().multiply(1.5).setY(1.5);
-				e.getEntity().setVelocity(newSpeed);
+				Vector newSpeed = event.getDamager().getLocation().getDirection().multiply(1.5).setY(1.5);
+				event.getEntity().setVelocity(newSpeed);
 			});
 		}
 	}
 
 	@EventHandler
 	private void onBurn(EntityCombustEvent event){
-		if (plugin.getConfigManager().burnInDay) return;
+		if (plugin.getConfigManager().isBurnInDay()) return;
 		if (!(event.getEntity() instanceof Zombie)) return;
 
 		ZombieType type = ZombieType.getType((Zombie) event.getEntity());
@@ -102,16 +102,16 @@ public class ZombieListener implements Listener {
 	}
 
 	@EventHandler
-	public void onEggSpawn(PlayerInteractEvent e){
-		if (e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getItem() == null) return;
-		if (e.getItem().getType() != Material.ZOMBIE_SPAWN_EGG) return;
+	public void onEggSpawn(PlayerInteractEvent event){
+		if (event.getAction() != Action.RIGHT_CLICK_BLOCK || event.getItem() == null) return;
+		if (event.getItem().getType() != Material.ZOMBIE_SPAWN_EGG) return;
 
-		ZombieType type = plugin.getZombieItems().getZombieType(e.getItem().getItemMeta());
+		ZombieType type = plugin.getZombieItems().getZombieType(event.getItem().getItemMeta());
 		if (type == null) return;
 
-		e.setCancelled(true);
+		event.setCancelled(true);
 
-		Location spawnLoc = e.getClickedBlock().getLocation().add(0, 1, 0);
+		Location spawnLoc = event.getClickedBlock().getLocation().add(0, 1, 0);
 		plugin.getZombieFactory().spawnZombie(spawnLoc, type, ZombieSpawnedEvent.SpawnReason.SPAWN_EGG);
 	}
 

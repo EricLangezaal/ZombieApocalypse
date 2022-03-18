@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 
 public class UpdateChecker {
 	
-	private JavaPlugin plugin;
+	private final JavaPlugin plugin;
 	public static final int RESOURCE_ID = 82106;
 	private Runnable onStart;
 	private Runnable onError;

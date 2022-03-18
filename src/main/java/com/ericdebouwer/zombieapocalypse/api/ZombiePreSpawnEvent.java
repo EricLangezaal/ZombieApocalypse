@@ -21,7 +21,7 @@ public class ZombiePreSpawnEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
 
     private boolean cancelled;
-    private Location location;
+    private final Location location;
     private ZombieType type;
 
     public ZombiePreSpawnEvent(Location location, ZombieType type){

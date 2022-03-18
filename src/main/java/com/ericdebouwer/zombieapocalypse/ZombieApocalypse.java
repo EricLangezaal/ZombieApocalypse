@@ -10,6 +10,7 @@ import com.ericdebouwer.zombieapocalypse.zombie.ZombieCommand;
 import com.ericdebouwer.zombieapocalypse.zombie.ZombieItems;
 import com.ericdebouwer.zombieapocalypse.zombie.ZombieListener;
 import com.ericdebouwer.zombieapocalypse.zombie.ZombieFactory;
+import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.event.entity.CreatureSpawnEvent;
@@ -17,16 +18,16 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Consumer;
 
+@Getter
 public class ZombieApocalypse extends JavaPlugin {
 
-	private ApocalypseManager apoManager;
+	private ApocalypseManager apocalypseManager;
 	private ConfigurationManager configManager;
 	private ZombieFactory zombieFactory;
 	private ZombieItems zombieItems;
 	
-	public boolean isPaperMC = false;
-	
-	public String logPrefix;
+	private boolean paperMC = false;
+	private String logPrefix;
 
 	@Override
 	public void onEnable(){
@@ -47,7 +48,7 @@ public class ZombieApocalypse extends JavaPlugin {
 		this.getCommand("apocalypse").setExecutor(apoCommand);
 		this.getCommand("apocalypse").setTabCompleter(apoCommand);
 		
-		apoManager = new ApocalypseManager(this);
+		apocalypseManager = new ApocalypseManager(this);
 		zombieItems = new ZombieItems(this);
 		
 		ZombieCommand zombieCommand = new ZombieCommand(this);
@@ -56,7 +57,7 @@ public class ZombieApocalypse extends JavaPlugin {
 		
 		try {
 			Class.forName("org.bukkit.World").getMethod("spawn", Location.class, Class.class, CreatureSpawnEvent.SpawnReason.class, Consumer.class);
-		    isPaperMC = true;
+			paperMC = true;
 		    getLogger().info("PaperMC detected! Changing spawning algorithm accordingly");
 		} catch (ClassNotFoundException | NoSuchMethodException ignore) {
 		}
@@ -72,7 +73,7 @@ public class ZombieApocalypse extends JavaPlugin {
 			getServer().getPluginManager().registerEvents(new SpawnerBreakListener(this), this);
 		}
 
-		if (configManager.checkUpdates) {
+		if (configManager.isCheckUpdates()) {
 			new UpdateChecker(this)
 					.onStart(() -> getLogger().info( "Checking for updates..."))
 					.onError(() -> getLogger().warning( "Failed to check for updates!"))
@@ -87,19 +88,7 @@ public class ZombieApocalypse extends JavaPlugin {
 	
 	@Override
 	public void onDisable(){
-		if (apoManager != null)
-			apoManager.onDisable();
+		if (apocalypseManager != null)
+			apocalypseManager.onDisable();
 	}
-
-	public ZombieItems getZombieItems() {return this.zombieItems; }
-	
-	public ApocalypseManager getApocalypseManager() {
-		return this.apoManager;
-	}
-	
-	public ConfigurationManager getConfigManager(){
-		return this.configManager;
-	}
-
-	public ZombieFactory getZombieFactory(){return this.zombieFactory;}
 }
