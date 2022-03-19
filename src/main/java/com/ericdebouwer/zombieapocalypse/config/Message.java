@@ -1,5 +1,9 @@
 package com.ericdebouwer.zombieapocalypse.config;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@AllArgsConstructor
 public enum Message {
 	START_SUCCESS("started-success"),
 	START_BROADCAST ("started-broadcast"),
@@ -22,10 +26,6 @@ public enum Message {
 	CAP_NO_APOCALYPSE("mobcap-no-apocalypse"),
 	CAP_SUCCESS ("mobcap-success");
 	
-	
-	String key;
-	Message(String key){
-		this.key = key;
-	}
-	public String getKey(){ return this.key;}
+	@Getter
+	private final String key;
 }

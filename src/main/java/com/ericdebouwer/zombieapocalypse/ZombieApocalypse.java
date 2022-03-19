@@ -11,6 +11,7 @@ import com.ericdebouwer.zombieapocalypse.zombie.ZombieItems;
 import com.ericdebouwer.zombieapocalypse.zombie.ZombieListener;
 import com.ericdebouwer.zombieapocalypse.zombie.ZombieFactory;
 import lombok.Getter;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.event.entity.CreatureSpawnEvent;
@@ -27,18 +28,15 @@ public class ZombieApocalypse extends JavaPlugin {
 	private ZombieItems zombieItems;
 	
 	private boolean paperMC = false;
-	private String logPrefix;
 
 	@Override
 	public void onEnable(){
-		logPrefix = "[" + this.getName() + "] ";
-
 		zombieFactory = new ZombieFactory(this);
 		configManager = new ConfigurationManager(this);
 
 		if (!configManager.isValid()){
-			getServer().getConsoleSender().sendMessage(ChatColor.BOLD + "" + ChatColor.RED + logPrefix + "Invalid config.yml, plugin will disable to prevent crashing!");
- 			getServer().getConsoleSender().sendMessage(ChatColor.BOLD + "" + ChatColor.RED + logPrefix + "See the header of the config.yml about fixing the problem.");
+			getLogger().warning("Invalid config.yml, plugin will disable to prevent crashing!");
+			getLogger().warning("See the header of the config.yml about fixing the problem.");
 			return;
 		}
 		getLogger().info("Configuration has been successfully loaded!");
@@ -71,6 +69,10 @@ public class ZombieApocalypse extends JavaPlugin {
 			getLogger().info("SilkSpawners detected! Making our spawners comply with it");
 			zombieItems = new SilkZombieItems(this);
 			getServer().getPluginManager().registerEvents(new SpawnerBreakListener(this), this);
+		}
+
+		if (configManager.isCollectMetrics()){
+			new Metrics(this, 14674);
 		}
 
 		if (configManager.isCheckUpdates()) {

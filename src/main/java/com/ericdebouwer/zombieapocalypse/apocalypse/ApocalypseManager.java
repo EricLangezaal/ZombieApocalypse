@@ -61,7 +61,7 @@ public class ApocalypseManager {
 			
 		} catch (IOException e) {
 			e.printStackTrace();
-			Bukkit.getConsoleSender().sendMessage(ChatColor.RED + plugin.getLogPrefix() + "Failed to load apocalypse data! Removed 'apocalypse.yml' and restart the server!");
+			plugin.getLogger().warning("Failed to load apocalypse data! Removed 'apocalypse.yml' and restart the server!");
 		}
 	}
 	

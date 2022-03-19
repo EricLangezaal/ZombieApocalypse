@@ -17,6 +17,9 @@ plugin-prefix: "§7<<§4Zombie§2Apocalypse§7>>§r "
 # whether the plugin will check for updates on start-up
 check-for-updates: true
 
+# whether the plugin will collect and send ANONYMOUS data to bStats.org
+collect-bstats-metrics: true
+
 # Settings for the different types of zombies.
 # For more details see: https://github.com/EricLangezaal/ZombieApocalypse/wiki/Configuring-the-zombies
 zombies:

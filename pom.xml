@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.ericdebouwer</groupId>
   <artifactId>ZombieApocalypse</artifactId>
-  <version>1.4.4</version>
+  <version>1.4.5</version>
   <repositories>
         <repository>
            <id>papermc</id>
@@ -35,6 +35,12 @@
            <artifactId>authlib</artifactId>
            <version>1.5.21</version>
            <scope>provided</scope>
+       </dependency>
+       <dependency>
+           <groupId>org.bstats</groupId>
+           <artifactId>bstats-bukkit</artifactId>
+           <version>3.0.0</version>
+           <scope>compile</scope>
        </dependency>
        <dependency>
            <groupId>de.dustplanet</groupId>
@@ -75,6 +81,12 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
+                            <relocations>
+                                <relocation>
+                                    <pattern>org.bstats</pattern>
+                                    <shadedPattern>com.ericdebouwer.zombieapocalypse.integration.bstats</shadedPattern>
+                                </relocation>
+                            </relocations>
                             <filters>
                                 <filter>
                                     <artifact>*:*</artifact>

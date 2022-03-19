@@ -17,8 +17,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
+import java.util.logging.Level;
 
 @Getter
 public class ConfigurationManager {
@@ -33,6 +34,8 @@ public class ConfigurationManager {
 	private String pluginPrefix;
 
 	private boolean checkUpdates;
+	private boolean collectMetrics;
+
 	@Accessors(fluent=true)
 	private boolean doBabies;
 	@Accessors(fluent=true)
@@ -50,30 +53,36 @@ public class ConfigurationManager {
 		this.plugin = plugin;
 		plugin.saveDefaultConfig();
 		
-		this.isValid = this.checkConfig();
+		this.isValid = this.checkAndUpdateConfig();
 		if (isValid) this.loadConfig();
 	}
 
-	private boolean checkConfig(){
-		boolean valid = this.validateConfig(true);
-		if (!valid){
-			if (handleUpdate()){
-				plugin.reloadConfig();
-				if (validateConfig(false)) {
-					plugin.getLogger().info("================================================================");
-					plugin.getLogger().info("Automatically updated old/invalid configuration file!");
-					plugin.getLogger().info("================================================================");
-		        	return true;
-				}
-			}
-			Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.RED + plugin.getLogPrefix() + "Automatic configuration update failed! You can delete the old 'config.yml' to get a new one.");
+	public boolean checkAndUpdateConfig() {
+		final String CONFIG_NAME = "config.yml";
+		File currentFile = new File(plugin.getDataFolder(), CONFIG_NAME);
+		InputStream templateStream = getClass().getClassLoader().getResourceAsStream(CONFIG_NAME);
+		if (templateStream == null) return false;
+		FileConfiguration templateConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(templateStream));
+
+		if (this.validateSection(templateConfig, plugin.getConfig(), true, true)) return true;
+		try {
+			ConfigUpdater.update(plugin, CONFIG_NAME, currentFile, Collections.emptyList());
+		} catch (IOException e){
+			return false;
 		}
-		return valid;
+		plugin.reloadConfig();
+		if (this.validateSection(templateConfig, plugin.getConfig(), true, false)){
+			plugin.getLogger().info("Automatically updated old/invalid configuration file!");
+			return true;
+		}
+		plugin.getLogger().warning("Automatic configuration update failed! See the header and the comments of the config.yml about fixing it");
+		return false;
 	}
 	
 	public void loadConfig(){
 		pluginPrefix = plugin.getConfig().getString("plugin-prefix");
 		checkUpdates = plugin.getConfig().getBoolean("check-for-updates", true);
+		collectMetrics = plugin.getConfig().getBoolean("collect-bstats-metrics", true);
 		doBabies = plugin.getConfig().getBoolean("allow-babies", true);
 		doNetherPigmen = plugin.getConfig().getBoolean("spawn-pigmen-in-nether", true);
 		burnInDay = plugin.getConfig().getBoolean("burn-in-day", true);
@@ -91,7 +100,7 @@ public class ConfigurationManager {
 				ZombieWrapper wrapper = new ZombieWrapper(type, section.getConfigurationSection(zombie));
 				plugin.getZombieFactory().addZombieWrapper(wrapper);
 			} catch (IllegalArgumentException e){
-				Bukkit.getConsoleSender().sendMessage(ChatColor.BOLD + "" + ChatColor.RED + plugin.getLogPrefix() + "Zombie type '" + zombie + "' doesn't exist and isn't loaded in.");
+				plugin.getLogger().warning("Zombie type '" + zombie + "' doesn't exist and isn't loaded in.");
 			}
 		}
 	}
@@ -112,44 +121,23 @@ public class ConfigurationManager {
 		}
 		p.sendMessage(colorMsg);		
 	}
-	
-	private boolean validateConfig(boolean log){
-		if (!this.validateSection("", "", false, log)) return false;
-		if (!this.validateSection(MESSAGES_PREFIX, MESSAGES_PREFIX, false, log)) return false;
-		return true;
-	}
-	
-	private boolean validateSection(String templatePath, String realPath, boolean deep, boolean log){
-		InputStream templateFile = getClass().getClassLoader().getResourceAsStream("config.yml");
-		FileConfiguration templateConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(templateFile));
 
-		ConfigurationSection realSection = plugin.getConfig().getConfigurationSection(realPath);
-		ConfigurationSection templateSection = templateConfig.getConfigurationSection(templatePath);
+	private boolean validateSection(FileConfiguration template, FileConfiguration actual, boolean deep, boolean log) {
+		if (template == null || actual == null) return false;
+		boolean valid = true;
 
-		if (realSection == null || templateSection == null) return false;
-        
- 		for(String key: templateSection.getKeys(deep)){
- 			if (!realSection.getKeys(deep).contains(key) || templateSection.get(key).getClass() != realSection.get(key).getClass()){
- 				if (log) plugin.getLogger().warning("Missing or invalid datatype key '" + key + "' and possibly others in config.yml");
- 				return false;
- 			}
- 		}
- 		return true;
-	}
-	
-	public boolean handleUpdate(){
-		File oldConfig = new File(plugin.getDataFolder(), "config.yml");
-		try {
-			ConfigUpdater.update(plugin, "config.yml", oldConfig, Arrays.asList("apocalypse-worlds", "version"));
-		} catch (IOException e){
-			return false;
+		for(String key: template.getKeys(deep)){
+			if (!actual.getKeys(deep).contains(key) || template.get(key).getClass() != actual.get(key).getClass()){
+				if (log) plugin.getLogger().log(Level.WARNING, "Missing or invalid datatype key '" + key + "' while parsing config.yml");
+				valid = false;
+			}
 		}
-		return true;
+		return valid;
 	}
 	
 	public void reloadConfig(){
 		plugin.reloadConfig();
-		this.isValid = this.checkConfig();
+		this.isValid = this.checkAndUpdateConfig();
 		if (isValid) this.loadConfig();
 	}
 
