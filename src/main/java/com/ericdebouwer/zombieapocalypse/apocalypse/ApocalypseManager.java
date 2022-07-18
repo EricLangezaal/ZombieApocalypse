@@ -4,7 +4,6 @@ import com.ericdebouwer.zombieapocalypse.ZombieApocalypse;
 import com.ericdebouwer.zombieapocalypse.config.Message;
 import com.google.common.collect.ImmutableMap;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -170,6 +169,8 @@ public class ApocalypseManager {
 
 		if (plugin.getConfigManager().isRemoveZombiesOnEnd()) {
 			for (Zombie zombie: world.getEntitiesByClass(Zombie.class)){
+				if (zombie.getCustomName() != null) continue;
+				if (zombie.getEquipment() != null && !zombie.getEquipment().getItemInMainHand().getType().isAir()) continue;
 				zombie.remove();
 			}
 		}

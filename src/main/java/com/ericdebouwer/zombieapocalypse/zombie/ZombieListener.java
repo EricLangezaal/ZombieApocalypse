@@ -15,7 +15,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.*;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.Vector;
 
@@ -97,7 +99,7 @@ public class ZombieListener implements Listener {
 		ZombieType type = plugin.getZombieItems().getZombieType(event.getSpawner());
 		if (type == null) return;
 
-		event.getEntity().remove(); //cancelling will make it respawn too quickly
+		event.getEntity().remove(); // cancelling will make it respawn too quickly
 		plugin.getZombieFactory().spawnZombie(event.getLocation(), type, ZombieSpawnedEvent.SpawnReason.CUSTOM_SPAWNER);
 	}
 
@@ -113,6 +115,18 @@ public class ZombieListener implements Listener {
 
 		Location spawnLoc = event.getClickedBlock().getLocation().add(0, 1, 0);
 		plugin.getZombieFactory().spawnZombie(spawnLoc, type, ZombieSpawnedEvent.SpawnReason.SPAWN_EGG);
+	}
+
+	@EventHandler
+	public void onZombieClick(PlayerInteractEntityEvent event){
+		if (event.getPlayer().getEquipment() == null) return;
+
+		ItemStack hand = event.getPlayer().getEquipment().getItem(event.getHand());
+		if (hand.getType() != Material.ZOMBIE_SPAWN_EGG) return;
+
+		ZombieType type = plugin.getZombieItems().getZombieType(hand.getItemMeta());
+		if (type == null) return;
+		event.setCancelled(true);
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)

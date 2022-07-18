@@ -82,6 +82,7 @@ do-zombie-block-damage: true
 spawn-pigmen-in-nether: true
 
 # whether or not my plugin will remove all custom zombies from an apocalypse world after the apocalypse has ended
+# if zombies pick up an item or have a custom name, they will never be removed
 remove-zombies-after-apocalypse: true
 
 # whether players can sleep when there is an apocalypse ongoing
