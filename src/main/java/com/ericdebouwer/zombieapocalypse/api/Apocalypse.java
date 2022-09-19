@@ -13,6 +13,13 @@ import javax.annotation.Nonnull;
 public interface Apocalypse {
 
     /**
+     * Get the name of the world this apocalypse is tied to, which does not have to be loaded.
+     *
+     * @return the name of the apocalyptic world
+     */
+    @Nonnull String getWorldName();
+
+    /**
      * Get the {@link org.bukkit.boss.BossBar} that is shown for players in that apocalypse.
      * Modifying it will modify the BossBar shown to players.
      *

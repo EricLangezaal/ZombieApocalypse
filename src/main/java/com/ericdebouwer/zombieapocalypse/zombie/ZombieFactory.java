@@ -4,6 +4,7 @@ import com.ericdebouwer.zombieapocalypse.ZombieApocalypse;
 import com.ericdebouwer.zombieapocalypse.api.ZombiePreSpawnEvent;
 import com.ericdebouwer.zombieapocalypse.api.ZombieSpawnedEvent;
 import com.ericdebouwer.zombieapocalypse.config.ZombieWrapper;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -13,17 +14,15 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
+@RequiredArgsConstructor
 public class ZombieFactory {
 
     private final ZombieApocalypse plugin;
     private final Map<ZombieType, ZombieWrapper> zombieWrappers = new HashMap<>();
-
-    public ZombieFactory(ZombieApocalypse plugin){
-        this.plugin = plugin;
-    }
 
     public void reload() {
         zombieWrappers.clear();
@@ -31,6 +30,10 @@ public class ZombieFactory {
 
     public void addZombieWrapper(ZombieWrapper wrapper){
         zombieWrappers.put(wrapper.getType(), wrapper);
+    }
+
+    public @Nonnull ZombieWrapper getWrapper(ZombieType type){
+        return zombieWrappers.getOrDefault(type, new ZombieWrapper(type));
     }
 
     private ZombieType getRandomZombieType(){
@@ -60,8 +63,7 @@ public class ZombieFactory {
             zombie.getVehicle().remove();
         }
 
-        ZombieWrapper wrapper = zombieWrappers.getOrDefault(type, new ZombieWrapper(type));
-        zombie = wrapper.apply(zombie);
+        zombie = getWrapper(type).apply(zombie);
 
         if (!plugin.getConfigManager().doBabies())
             zombie.setBaby(false);

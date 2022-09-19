@@ -25,20 +25,25 @@ collect-bstats-metrics: true
 zombies:
    DEFAULT:
       enabled: true
+      name: ""
       head: ""
    SPRINTER:
       enabled: true
+      name: ""
       head: "http://textures.minecraft.net/texture/608d83a505cb9220db26e0ce87187c7b46dcc7b1d171ec23752bab0f7a87e2e7"
       attributes:
          generic_movement_speed: 0.45
    BOOMER:
       enabled: true
+      name: ""
       head: "http://textures.minecraft.net/texture/3ec33735f71e2b7756d7cfafcf5cb0a9cd357d4174a47c5f073c1134902cf4d"
    THROWER:
       enabled: true
+      name: ""
       head: "http://textures.minecraft.net/texture/4fd55a13b973d6d4cc5badda11c8a0436470b601a9883b91c4b59c48c9a76aab"
    TANK:
       enabled: true
+      name: ""
       head: "http://textures.minecraft.net/texture/65e97ef120d94e916d196fc65c141a31c20540b083daf86a00b201885b4ef49c"
       attributes:
          generic_movement_speed: 0.2
@@ -48,6 +53,7 @@ zombies:
 
    NINJA:
       enabled: true
+      name: ""
       head: "http://textures.minecraft.net/texture/b72fdeb1274cba67316b206c9f77438964c90971af996c35be2395f6477469b"
       attributes:
          generic_movement_speed: 0.4
@@ -55,15 +61,18 @@ zombies:
          generic_attack_damage: 6.0
    MULTIPLIER:
       enabled: true
+      name: ""
       head: "http://textures.minecraft.net/texture/bf938ae03138b2d022d6280858fc67e2612086e8112f9d1546764561978425b1"
    JUMPER:
       enabled: true
+      name: ""
       head: "http://textures.minecraft.net/texture/a20e84d32d1e9c919d3fdbb53f2b37ba274c121c57b2810e5a472f40dacf004f"
    PILLAR:
       enabled: true
+      name: ""
       head: ""
     
-# whether or not some of the zombies can spawn as babies, like zombies normally do
+# whether some of the zombies can spawn as babies, like zombies normally do
 allow-babies: true
 
 # zombies with custom heads will never burn, should the ones without burn in the day?
@@ -81,7 +90,7 @@ do-zombie-block-damage: true
 # by default those will be zombified pigmen/piglins instead
 spawn-pigmen-in-nether: true
 
-# whether or not my plugin will remove all custom zombies from an apocalypse world after the apocalypse has ended
+# whether my plugin will remove all custom zombies from an apocalypse world after the apocalypse has ended
 # if zombies pick up an item or have a custom name, they will never be removed
 remove-zombies-after-apocalypse: true
 

@@ -2,9 +2,11 @@ package com.ericdebouwer.zombieapocalypse.config;
 
 import com.ericdebouwer.zombieapocalypse.ZombieApocalypse;
 import com.ericdebouwer.zombieapocalypse.zombie.ZombieType;
+import com.google.common.base.Strings;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import lombok.Getter;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.configuration.ConfigurationSection;
@@ -23,8 +25,10 @@ public class ZombieWrapper {
 
     private ItemStack head;
     @Getter
+    private String customName;
+    @Getter
     private final ZombieType type;
-    public Map<Attribute, Double> attributes = new HashMap<>();
+    private final Map<Attribute, Double> attributes = new HashMap<>();
 
     public ZombieWrapper(ZombieType type){
         this(type, null);
@@ -36,6 +40,11 @@ public class ZombieWrapper {
 
         String textureUrl = section.getString("head", "");
         head = getHead(textureUrl);
+
+        customName = Strings.emptyToNull(section.getString("name"));
+        if (customName != null){
+            customName = ChatColor.translateAlternateColorCodes('§', customName);
+        }
 
         ConfigurationSection attributeSection = section.getConfigurationSection("attributes");
         if (attributeSection == null) return;
@@ -51,6 +60,11 @@ public class ZombieWrapper {
     public Zombie apply(Zombie zombie){
         if (head != null)
             zombie.getEquipment().setHelmet(head);
+
+        if (customName != null){
+            zombie.setCustomName(customName);
+            zombie.setCustomNameVisible(true);
+        }
 
         for (Map.Entry<Attribute, Double> attribute: attributes.entrySet()){
             zombie.getAttribute(attribute.getKey()).setBaseValue(attribute.getValue());

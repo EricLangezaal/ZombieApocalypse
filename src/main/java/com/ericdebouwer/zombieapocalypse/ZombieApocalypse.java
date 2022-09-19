@@ -7,12 +7,11 @@ import com.ericdebouwer.zombieapocalypse.config.ConfigurationManager;
 import com.ericdebouwer.zombieapocalypse.integration.silkspawners.SilkZombieItems;
 import com.ericdebouwer.zombieapocalypse.integration.silkspawners.SpawnerBreakListener;
 import com.ericdebouwer.zombieapocalypse.zombie.ZombieCommand;
+import com.ericdebouwer.zombieapocalypse.zombie.ZombieFactory;
 import com.ericdebouwer.zombieapocalypse.zombie.ZombieItems;
 import com.ericdebouwer.zombieapocalypse.zombie.ZombieListener;
-import com.ericdebouwer.zombieapocalypse.zombie.ZombieFactory;
 import lombok.Getter;
 import org.bstats.bukkit.Metrics;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.plugin.Plugin;
@@ -76,12 +75,13 @@ public class ZombieApocalypse extends JavaPlugin {
 		}
 
 		if (configManager.isCheckUpdates()) {
-			new UpdateChecker(this)
+			int resourceId = 82106;
+			new UpdateChecker(this, resourceId)
 					.onStart(() -> getLogger().info( "Checking for updates..."))
 					.onError(() -> getLogger().warning( "Failed to check for updates!"))
 					.onOldVersion((oldVersion, newVersion) -> {
 						getLogger().info( "Update detected! You are using version " + oldVersion + ", but version " + newVersion + " is available!");
-						getLogger().info("You can download the new version here -> https://www.spigotmc.org/resources/" +  UpdateChecker.RESOURCE_ID + "/updates");
+						getLogger().info("You can download the new version here -> https://www.spigotmc.org/resources/" + resourceId + "/updates");
 					})
 					.onNoUpdate(() -> getLogger().info("You are running the latest version."))
 					.run();

@@ -10,7 +10,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarFlag;
 import org.bukkit.boss.BarStyle;
-import org.bukkit.boss.BossBar;
+import org.bukkit.boss.KeyedBossBar;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -19,13 +19,14 @@ import java.util.List;
 
 public class ApocalypseWorld implements Apocalypse {
 
-	public String worldName;
 	@Getter
-	public long endEpochSecond;
+	private final String worldName;
 	@Getter
-	public BossBar bossBar;
+	private final long endEpochSecond;
+	@Getter
+	private KeyedBossBar bossBar;
 	@Getter @Setter
-	public int mobCap;
+	private int mobCap;
 
 	private BukkitTask barCountDown;
 

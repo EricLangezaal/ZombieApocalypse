@@ -1,7 +1,10 @@
 package com.ericdebouwer.zombieapocalypse.apocalypse;
 
 import com.ericdebouwer.zombieapocalypse.ZombieApocalypse;
+import com.ericdebouwer.zombieapocalypse.api.ApocalypseEndEvent;
+import com.ericdebouwer.zombieapocalypse.api.ApocalypseStartEvent;
 import com.ericdebouwer.zombieapocalypse.config.Message;
+import com.ericdebouwer.zombieapocalypse.zombie.ZombieType;
 import com.google.common.collect.ImmutableMap;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -17,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 public class ApocalypseManager {
@@ -68,8 +72,8 @@ public class ApocalypseManager {
 	private void saveConfig(){
 		try{
 			for (ApocalypseWorld world: apocalypseWorlds){
-				apoConfig.set(world.worldName + UNTIL_KEY, world.endEpochSecond);
-				apoConfig.set(world.worldName + MOB_CAP_KEY, world.mobCap);
+				apoConfig.set(world.getWorldName() + UNTIL_KEY, world.getEndEpochSecond());
+				apoConfig.set(world.getWorldName() + MOB_CAP_KEY, world.getMobCap());
 			}
 			this.apoConfig.save(apoFile);
 		} catch (IOException | NullPointerException e){
@@ -97,7 +101,7 @@ public class ApocalypseManager {
 	}
 	
 	public Optional<ApocalypseWorld> getApoWorld(String worldName){
-		return apocalypseWorlds.stream().filter(w -> w.worldName.equals(worldName)).findFirst();
+		return apocalypseWorlds.stream().filter(w -> w.getWorldName().equals(worldName)).findFirst();
 	}
 	
 	public boolean isApocalypse(String worldName){
@@ -116,6 +120,14 @@ public class ApocalypseManager {
 		if (!potentialWorld.exists() || !potentialWorld.isDirectory()) return false;
 		
 		ApocalypseWorld apoWorld = new ApocalypseWorld(plugin, worldName, endTime, mobCap);
+
+		ApocalypseStartEvent event = new ApocalypseStartEvent(apoWorld);
+		Bukkit.getPluginManager().callEvent(event);
+		if (event.isCancelled()){
+			Bukkit.removeBossBar(apoWorld.getBossBar().getKey());
+			return true;
+		}
+
 		apocalypseWorlds.add(apoWorld);
 		
 		if (endTime > 0){
@@ -150,8 +162,14 @@ public class ApocalypseManager {
 		Optional<ApocalypseWorld> apoWorld = this.getApoWorld(worldName);
 		if (!apoWorld.isPresent()) return false;
 
-		apocalypseWorlds.remove(apoWorld.get());
+		ApocalypseEndEvent event = new ApocalypseEndEvent(apoWorld.get());
+		Bukkit.getPluginManager().callEvent(event);
+		if (event.isCancelled()){
+			return true;
+		}
+
 		Optional.ofNullable(apoEnders.remove(worldName)).ifPresent(BukkitTask::cancel);
+		apocalypseWorlds.remove(apoWorld.get());
 		apoConfig.set(worldName, null);
 		apoWorld.get().endCountDown();
 
@@ -169,8 +187,8 @@ public class ApocalypseManager {
 
 		if (plugin.getConfigManager().isRemoveZombiesOnEnd()) {
 			for (Zombie zombie: world.getEntitiesByClass(Zombie.class)){
-				if (zombie.getCustomName() != null) continue;
 				if (zombie.getEquipment() != null && !zombie.getEquipment().getItemInMainHand().getType().isAir()) continue;
+				if (!Objects.equals(zombie.getCustomName(), plugin.getZombieFactory().getWrapper(ZombieType.getType(zombie)).getCustomName())) continue;
 				zombie.remove();
 			}
 		}

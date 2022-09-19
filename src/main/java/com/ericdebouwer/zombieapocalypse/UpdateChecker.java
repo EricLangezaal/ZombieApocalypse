@@ -1,5 +1,7 @@
 package com.ericdebouwer.zombieapocalypse;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -11,19 +13,16 @@ import java.util.Scanner;
 import java.util.function.BiConsumer;
 import java.util.regex.Pattern;
 
-
+@RequiredArgsConstructor
 public class UpdateChecker {
 	
 	private final JavaPlugin plugin;
-	public static final int RESOURCE_ID = 82106;
+	@Getter
+	private final int resourceId;
 	private Runnable onStart;
 	private Runnable onError;
 	private Runnable onNoUpdate;
 	private BiConsumer<String, String> onOldVersion;
-	
-	public UpdateChecker(JavaPlugin plugin){
-		this.plugin = plugin;
-	}
 	
 	public UpdateChecker onError(Runnable errorTask){
 		this.onError = errorTask;
@@ -54,7 +53,7 @@ public class UpdateChecker {
 			
 			if (onStart != null) this.onStart.run();
 			
-            try (InputStream inputStream = new URL(apiUrl + RESOURCE_ID).openStream(); Scanner scanner = new Scanner(inputStream)) {
+            try (InputStream inputStream = new URL(apiUrl + resourceId).openStream(); Scanner scanner = new Scanner(inputStream)) {
 	               	String latestVersion = scanner.next();
 
             		if (!isUpToDate(currentVersion, latestVersion)) {

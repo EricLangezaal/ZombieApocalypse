@@ -12,10 +12,10 @@ import javax.annotation.Nonnull;
  * Called when a zombie is about to spawn due to the zombie apocalypse only
  * If ZombiePreSpawnEvent is cancelled, the zombie will not spawn.  <br>
  *
- * If you want to modify the actual zombie, use {@link ZombieSpawnedEvent}.
- *
+ * If you want to modify the actual zombie, use {@link ZombieSpawnedEvent}. <br>
  * <b>Author</b> - 3ricL (Ericdebouwer).
  */
+
 public class ZombiePreSpawnEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();

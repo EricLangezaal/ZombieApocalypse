@@ -26,8 +26,7 @@ public enum ZombieType {
 			if (tag.startsWith(ZOMBIE_IDENTIFIER)){
 				try {
 					String type = tag.replaceFirst(ZOMBIE_IDENTIFIER, "");
-					ZombieType result = ZombieType.valueOf(type);
-					return result;
+					return ZombieType.valueOf(type);
 				}catch (IllegalArgumentException e){
 					return ZombieType.DEFAULT;
 				}

@@ -6,6 +6,7 @@ import java.util.stream.Stream;
 
 import com.ericdebouwer.zombieapocalypse.ZombieApocalypse;
 import com.ericdebouwer.zombieapocalypse.config.Message;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -16,17 +17,14 @@ import org.bukkit.inventory.ItemStack;
 
 import com.google.common.collect.ImmutableMap;
 
+@RequiredArgsConstructor
 public class ZombieCommand implements CommandExecutor, TabCompleter{
 	
-	ZombieApocalypse plugin;
+	private final ZombieApocalypse plugin;
 
 	private final String EGG_ARG = "egg";
 	private final String SPAWNER_ARG = "spawner";
 	private final List<String> arguments = Arrays.asList(EGG_ARG, SPAWNER_ARG);
-	
-	public ZombieCommand(ZombieApocalypse plugin) {
-		this.plugin = plugin;
-	}
 
 	public boolean onCommand(CommandSender sender, Command command,	String label, String[] args) {
 		if (!(sender instanceof Player)){

@@ -27,7 +27,7 @@ public class ApocalypseListener implements Listener {
     public void worldLoad(WorldLoadEvent event){
         Optional<ApocalypseWorld> apoWorld = manager.getApoWorld(event.getWorld().getName());
         if (!apoWorld.isPresent()) return;
-        event.getWorld().setMonsterSpawnLimit(apoWorld.get().mobCap);
+        event.getWorld().setMonsterSpawnLimit(apoWorld.get().getMobCap());
     }
 
     @EventHandler

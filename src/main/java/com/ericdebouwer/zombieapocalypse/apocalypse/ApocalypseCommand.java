@@ -6,8 +6,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.ericdebouwer.zombieapocalypse.ZombieApocalypse;
+import com.ericdebouwer.zombieapocalypse.api.ZombieApocalypseReloadEvent;
 import com.ericdebouwer.zombieapocalypse.config.ConfigurationManager;
 import com.ericdebouwer.zombieapocalypse.config.Message;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -50,6 +52,8 @@ public class ApocalypseCommand implements CommandExecutor, TabCompleter {
 			plugin.getApocalypseManager().reload();
 			if (configManager.isValid()) configManager.sendMessage(sender, Message.RELOAD_SUCCESS, null);
 			else configManager.sendMessage(sender, Message.RELOAD_FAIL, null);
+			
+			Bukkit.getPluginManager().callEvent(new ZombieApocalypseReloadEvent(configManager.isValid()));
 			return true;
 		}
 		
