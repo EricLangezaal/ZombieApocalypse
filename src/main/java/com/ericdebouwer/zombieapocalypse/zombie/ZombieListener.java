@@ -8,6 +8,7 @@ import com.ericdebouwer.zombieapocalypse.ZombieApocalypse;
 import com.ericdebouwer.zombieapocalypse.api.ZombieSpawnedEvent;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.CreatureSpawner;
@@ -37,9 +38,9 @@ public class ZombieListener implements Listener {
 	private final ZombieApocalypse plugin;
 	private final Set<CreatureSpawnEvent.SpawnReason> ignoreReasons = EnumSet.of(CreatureSpawnEvent.SpawnReason.BUILD_IRONGOLEM,
 			CreatureSpawnEvent.SpawnReason.BUILD_WITHER, CreatureSpawnEvent.SpawnReason.BUILD_SNOWMAN, CreatureSpawnEvent.SpawnReason.CUSTOM,
-			CreatureSpawnEvent.SpawnReason.SPAWNER_EGG, CreatureSpawnEvent.SpawnReason.CURED);
+			CreatureSpawnEvent.SpawnReason.SPAWNER_EGG, CreatureSpawnEvent.SpawnReason.CURED, CreatureSpawnEvent.SpawnReason.RAID);
 	
-	@EventHandler
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	private void onMobSpawn(CreatureSpawnEvent event){
 		if (!(plugin.getApocalypseManager().isApocalypse(event.getLocation().getWorld().getName()))) return;
 		if (!(event.getEntity() instanceof Monster)) return;
@@ -121,6 +122,13 @@ public class ZombieListener implements Listener {
 
 		Location spawnLoc = event.getClickedBlock().getLocation().add(0, 1, 0);
 		plugin.getZombieFactory().spawnZombie(spawnLoc, type, ZombieSpawnedEvent.SpawnReason.SPAWN_EGG);
+
+		if (event.getPlayer().getGameMode() == GameMode.SURVIVAL){
+			if (event.getItem().getAmount() > 1) {
+				event.getItem().setAmount(event.getItem().getAmount() - 1);
+				event.getPlayer().getInventory().setItem(event.getHand(), event.getItem());
+			} else event.getPlayer().getInventory().setItem(event.getHand(), null);
+		}
 	}
 
 	@EventHandler

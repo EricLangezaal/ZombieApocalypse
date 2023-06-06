@@ -72,7 +72,7 @@ zombies:
       name: ""
       head: ""
     
-# whether some of the zombies can spawn as babies, like zombies normally do
+# whether some zombies can spawn as babies, like zombies normally do
 allow-babies: true
 
 # zombies with custom heads will never burn, should the ones without burn in the day?
