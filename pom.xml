@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.ericdebouwer</groupId>
   <artifactId>ZombieApocalypse</artifactId>
-  <version>1.4.7</version>
+  <version>1.4.8</version>
   <repositories>
         <repository>
            <id>papermc</id>
@@ -33,7 +33,7 @@
        <dependency>
            <groupId>com.mojang</groupId>
            <artifactId>authlib</artifactId>
-           <version>1.5.21</version>
+           <version>5.0.47</version>
            <scope>provided</scope>
        </dependency>
        <dependency>
