@@ -35,6 +35,7 @@ public class ConfigurationManager {
 	private boolean checkUpdates;
 	private boolean collectMetrics;
 
+	private boolean removeSkullDrops;
 	@Accessors(fluent=true)
 	private boolean doBabies;
 	@Accessors(fluent=true)
@@ -82,6 +83,7 @@ public class ConfigurationManager {
 		pluginPrefix = plugin.getConfig().getString("plugin-prefix");
 		checkUpdates = plugin.getConfig().getBoolean("check-for-updates", true);
 		collectMetrics = plugin.getConfig().getBoolean("collect-bstats-metrics", true);
+		removeSkullDrops = plugin.getConfig().getBoolean("remove-skulls-from-death-drops", true);
 		doBabies = plugin.getConfig().getBoolean("allow-babies", true);
 		doNetherPigmen = plugin.getConfig().getBoolean("spawn-pigmen-in-nether", true);
 		burnInDay = plugin.getConfig().getBoolean("burn-in-day", true);

@@ -57,8 +57,10 @@ public class ZombieListener implements Listener {
 	private void onDeath(EntityDeathEvent event){
 		if (!(event.getEntity() instanceof Zombie)) return;
 		Zombie zombie = (Zombie) event.getEntity();
-		
-		event.getDrops().removeIf(i -> i.getType() == Material.PLAYER_HEAD);
+
+		if (plugin.getConfigManager().isRemoveSkullDrops()){
+			event.getDrops().removeIf(i -> i.getType() == Material.PLAYER_HEAD);
+		}
 		
 		ZombieType type = ZombieType.getType(zombie);
 		if (type == ZombieType.BOOMER){
