@@ -8,6 +8,9 @@ If something crashes or doesn't work, feel free to post an [issue](https://githu
 
 Have a suggestion to improve this plugin? Let me know on the Spigot discussion page or in a Spigot private message.
 
+## Configuration translations
+A kind user (Kauo7420) of this plugin has provided some translations of the main [configuration files](https://github.com/EricLangezaal/ZombieApocalypse/issues/15). I have not personally tested these nor validated them for correctness. 
+
 ## Developer API
 Since version 1.3, this plugin has a large developer API. For an overview, [see the wiki!](https://github.com/EricLangezaal/ZombieApocalypse/wiki/)
 
