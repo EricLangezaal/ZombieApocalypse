@@ -1,9 +1,5 @@
 package com.ericdebouwer.zombieapocalypse.zombie;
 
-import java.util.EnumSet;
-import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
-
 import com.ericdebouwer.zombieapocalypse.ZombieApocalypse;
 import com.ericdebouwer.zombieapocalypse.api.ZombieSpawnedEvent;
 import lombok.RequiredArgsConstructor;
@@ -32,19 +28,18 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.Vector;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 @RequiredArgsConstructor
 public class ZombieListener implements Listener {
 
 	private final ZombieApocalypse plugin;
-	private final Set<CreatureSpawnEvent.SpawnReason> ignoreReasons = EnumSet.of(CreatureSpawnEvent.SpawnReason.BUILD_IRONGOLEM,
-			CreatureSpawnEvent.SpawnReason.BUILD_WITHER, CreatureSpawnEvent.SpawnReason.BUILD_SNOWMAN, CreatureSpawnEvent.SpawnReason.CUSTOM,
-			CreatureSpawnEvent.SpawnReason.SPAWNER_EGG, CreatureSpawnEvent.SpawnReason.CURED, CreatureSpawnEvent.SpawnReason.RAID);
-	
+
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	private void onMobSpawn(CreatureSpawnEvent event){
 		if (!(plugin.getApocalypseManager().isApocalypse(event.getLocation().getWorld().getName()))) return;
 		if (!(event.getEntity() instanceof Monster)) return;
-		if (ignoreReasons.contains(event.getSpawnReason())) return;
+		if (plugin.getConfigManager().getIgnoredReasons().contains(event.getSpawnReason())) return;
 
 		if (event.getEntity() instanceof Zombie && ZombieType.getType((Zombie) event.getEntity()) != null) return;
 		if (event.getEntity().hasMetadata("ignoreZombie")) return;

@@ -20,6 +20,17 @@ check-for-updates: true
 # whether the plugin will collect and send ANONYMOUS data to bStats.org
 collect-bstats-metrics: true
 
+# Normally this plugin will replace any monster that spawns during an apocalypse with a custom zombie
+# Below, you can list spawn reasons to exclude, meaning monsters spawned with that spawn reason will not be changed
+# Please see https://hub.spigotmc.org/javadocs/spigot/org/bukkit/event/entity/CreatureSpawnEvent.SpawnReason.html
+ignored-spawn-reasons:
+   - "build_wither" # i.e. do not replace the wither when players try to build it
+   - "custom" # i.e. spawned through another plugin
+   - "spawner_egg" # i.e. through a mob egg
+   # - "raid" # uncomment if you still want raids to commence like normal during the apocalypse
+   # - "spell" # also uncomment this for raids
+   # - "spawner" # uncomment if you want monster spawners to be excluded
+
 # Settings for the different types of zombies.
 # For more details see: https://github.com/EricLangezaal/ZombieApocalypse/wiki/Configuring-the-zombies
 zombies:

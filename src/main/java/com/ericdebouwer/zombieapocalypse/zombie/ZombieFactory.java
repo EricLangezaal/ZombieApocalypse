@@ -88,11 +88,10 @@ public class ZombieFactory {
         Bukkit.getServer().getPluginManager().callEvent(spawnedEvent);
         return spawnedEvent.getZombie();
     }
-
-    @SuppressWarnings({ "unchecked", "rawtypes"})
+    
     private Zombie spawnForEnvironment(Location loc, ZombieType type){
         boolean isNether = loc.getWorld().getEnvironment() == World.Environment.NETHER;
-        Class environmentType = (isNether && plugin.getConfigManager().doNetherPigmen()) ? PigZombie.class : Zombie.class;
+        Class<? extends Zombie> environmentType = (isNether && plugin.getConfigManager().doNetherPigmen()) ? PigZombie.class : Zombie.class;
 
         if (loc.getBlock().getType() == Material.WATER){
             environmentType = Drowned.class;

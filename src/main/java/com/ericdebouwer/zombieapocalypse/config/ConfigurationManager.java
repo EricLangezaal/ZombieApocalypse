@@ -11,12 +11,15 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -35,6 +38,7 @@ public class ConfigurationManager {
 	private boolean checkUpdates;
 	private boolean collectMetrics;
 
+	private final Collection<CreatureSpawnEvent.SpawnReason> ignoredReasons = new HashSet<>();
 	private boolean removeSkullDrops;
 	@Accessors(fluent=true)
 	private boolean doBabies;
@@ -92,6 +96,15 @@ public class ConfigurationManager {
 		bossBarFog = plugin.getConfig().getBoolean("bossbar-fog", true);
 		allowSleep = plugin.getConfig().getBoolean("allow-sleep", true);
 		removeZombiesOnEnd = plugin.getConfig().getBoolean("remove-zombies-after-apocalypse", true);
+
+		plugin.getConfig().getStringList("ignored-spawn-reasons").forEach((s) -> {
+			try {
+				s = s.toUpperCase().replace("-", "_");
+				ignoredReasons.add(CreatureSpawnEvent.SpawnReason.valueOf(s));
+			} catch (IllegalArgumentException ex){
+				plugin.getLogger().warning("Spawn reason '" + s + "' cannot be found! Please check if it is spelled correctly.");
+			}
+		});
 
 		ConfigurationSection section = plugin.getConfig().getConfigurationSection(ZOMBIES_PREFIX);
 		for (String zombie: section.getKeys(false)){
