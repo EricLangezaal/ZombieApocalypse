@@ -116,9 +116,9 @@ messages:
    no-command-permission: "§4§lSorry§r§7, you don't have permission for that!"
 
    # started-success supports placeholder {world_name}
-   started-success: "§aApocalyse succesfully started in '{world_name}'!"
+   started-success: "§aApocalypse succesfully started in '{world_name}'!"
    # started-broadcast supports placeholder {world_name}
-   started-broadcast: "§dThe zombie apocalyse has just started!"
+   started-broadcast: "§dThe zombie apocalypse has just started!"
    # started-failed supports placeholder {world_name}
    start-failed: "§cApocalypse has already started in '{world_name}'"
    # started-failed supports placeholder {input}, for the users faulty duration input
@@ -129,7 +129,7 @@ messages:
    # ended-failed supports placeholder {world_name}
    end-failed: "§cThere is no apocalypse in '{world_name}'" 
    # ended-broadcast supports placeholder {world_name}
-   ended-broadcast: "§dThe zombie apocalyse has ended in this world, you are safe (for now)!"
+   ended-broadcast: "§dThe zombie apocalypse has ended in this world, you are safe (for now)!"
    
    reload-success: "§aThe plugin has been successfully reloaded!"
    reload-fail: "§cReloading the configuration failed! See the console for more details."
