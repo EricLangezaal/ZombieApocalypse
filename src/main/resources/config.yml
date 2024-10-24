@@ -89,6 +89,10 @@ allow-babies: true
 # zombies with custom heads will never burn, should the ones without burn in the day?
 burn-in-day: false
 
+# minimum height for apocalypse zombies to spawn, can be used to prevent underground spawns
+# set to -64 (or lower) to disable
+minimum-spawn-height: -64
+
 # whether the bossbar appears for players inside an apocalypse
 do-bossbar: true
 # whether the bossbar will have a fog effect, might not work on some versions

@@ -6,6 +6,7 @@ import com.google.common.base.Strings;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
@@ -14,9 +15,13 @@ import org.bukkit.entity.Zombie;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.profile.PlayerProfile;
+import org.bukkit.profile.PlayerTextures;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -82,18 +87,30 @@ public class ZombieWrapper {
 
         ItemStack head = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta headMeta = (SkullMeta) head.getItemMeta();
-        
-        GameProfile profile = new GameProfile(UUID.randomUUID(), "");
-        byte[] encodedData = Base64.getEncoder().encode(String.format("{textures:{SKIN:{url:\"%s\"}}}", textureUrl).getBytes());
-        profile.getProperties().put("textures", new Property("textures", new String(encodedData)));
+
         try {
+            GameProfile profile = new GameProfile(UUID.randomUUID(), "");
+            byte[] encodedData = Base64.getEncoder().encode(String.format("{textures:{SKIN:{url:\"%s\"}}}", textureUrl).getBytes());
+            profile.getProperties().put("textures", new Property("textures", new String(encodedData)));
             Method setProfile = headMeta.getClass().getDeclaredMethod("setProfile", GameProfile.class);
             setProfile.setAccessible(true);
             setProfile.invoke(headMeta, profile);
+
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e1) {
-            JavaPlugin.getPlugin(ZombieApocalypse.class).getLogger().info("Zombie head could not be set, is the minecraft version correct?");
+            // this will only happen on new versions, where the proper API can be used
+            PlayerProfile profile = Bukkit.createPlayerProfile(UUID.randomUUID());
+            PlayerTextures textures = profile.getTextures();
+            try {
+                textures.setSkin(new URL(textureUrl));
+            } catch (MalformedURLException exception) {
+                JavaPlugin.getPlugin(ZombieApocalypse.class).getLogger().info("Zombie head could not be set, is the url provided correct?");
+            }
+            profile.setTextures(textures);
+            headMeta.setOwnerProfile(profile);
+
         }
         head.setItemMeta(headMeta);
         return head;
     }
+
 }

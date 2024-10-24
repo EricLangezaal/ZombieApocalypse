@@ -45,6 +45,7 @@ public class ZombieListener implements Listener {
 		if (event.getEntity().hasMetadata("ignoreZombie")) return;
 
 		event.setCancelled(true);
+		if (event.getLocation().getBlockY() < plugin.getConfigManager().getMinSpawnHeight()) return;
 		plugin.getZombieFactory().spawnApocalypseZombie(event.getLocation());
 	}
 	

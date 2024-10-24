@@ -45,6 +45,7 @@ public class ConfigurationManager {
 	@Accessors(fluent=true)
 	private boolean doNetherPigmen;
 	private boolean burnInDay;
+	private int minSpawnHeight;
 	private boolean blockDamage;
 	@Accessors(fluent=true)
 	private boolean doBossBar;
@@ -91,6 +92,7 @@ public class ConfigurationManager {
 		doBabies = plugin.getConfig().getBoolean("allow-babies", true);
 		doNetherPigmen = plugin.getConfig().getBoolean("spawn-pigmen-in-nether", true);
 		burnInDay = plugin.getConfig().getBoolean("burn-in-day", true);
+		minSpawnHeight = plugin.getConfig().getInt("minimum-spawn-height", -64);
 		blockDamage = plugin.getConfig().getBoolean("do-zombie-block-damage", true);
 		doBossBar = plugin.getConfig().getBoolean("do-bossbar", true);
 		bossBarFog = plugin.getConfig().getBoolean("bossbar-fog", true);
