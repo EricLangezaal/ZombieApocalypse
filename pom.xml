@@ -4,10 +4,17 @@
   <artifactId>ZombieApocalypse</artifactId>
   <version>1.4.11</version>
   <repositories>
-        <repository>
-           <id>papermc</id>
-           <url>https://papermc.io/repo/repository/maven-public/</url>
-		</repository>
+      <repository>
+          <id>papermc</id>
+          <url>https://repo.papermc.io/repository/maven-public/</url>
+          <snapshots>
+              <enabled>true</enabled>
+          </snapshots>
+      </repository>
+      <repository>
+          <id>minecraft-repo</id>
+          <url>https://libraries.minecraft.net/</url>
+      </repository>
         <repository>
           <id>SilkSpawners-Repo</id>
           <url>https://repo.dustplanet.de/artifactory/libs-release-local</url>
@@ -17,13 +24,13 @@
        <dependency>
            <groupId>io.papermc.paper</groupId>
            <artifactId>paper-api</artifactId>
-           <version>1.18.2-R0.1-SNAPSHOT</version>
+           <version>1.19.4-R0.1-SNAPSHOT</version>
            <scope>provided</scope>
        </dependency>
        <dependency>
            <groupId>com.mojang</groupId>
            <artifactId>authlib</artifactId>
-           <version>5.0.48</version>
+           <version>1.5.21</version>
            <scope>provided</scope>
        </dependency>
        <dependency>

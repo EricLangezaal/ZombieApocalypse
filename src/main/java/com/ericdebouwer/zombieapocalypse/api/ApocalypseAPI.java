@@ -2,7 +2,7 @@ package com.ericdebouwer.zombieapocalypse.api;
 
 import com.ericdebouwer.zombieapocalypse.ZombieApocalypse;
 import com.ericdebouwer.zombieapocalypse.zombie.ZombieType;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.Location;
 import org.bukkit.entity.Zombie;
 import org.bukkit.plugin.java.JavaPlugin;
