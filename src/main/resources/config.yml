@@ -100,6 +100,8 @@ bossbar-fog: true
 
 # if zombies (currently only boomer) should do block damage
 do-zombie-block-damage: true
+# if zombies (currently only boomer) should damage entities that aren't players
+do-non-player-damage: true
 
 # Whether to remove zombie skulls that can be dropped when a zombie with a custom head is killed
 remove-skulls-from-death-drops: true

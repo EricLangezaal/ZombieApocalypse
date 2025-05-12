@@ -47,6 +47,7 @@ public class ConfigurationManager {
 	private boolean burnInDay;
 	private int minSpawnHeight;
 	private boolean blockDamage;
+	private boolean nonPlayerEntityDamage;
 	@Accessors(fluent=true)
 	private boolean doBossBar;
 	private boolean bossBarFog;
@@ -94,6 +95,7 @@ public class ConfigurationManager {
 		burnInDay = plugin.getConfig().getBoolean("burn-in-day", true);
 		minSpawnHeight = plugin.getConfig().getInt("minimum-spawn-height", -64);
 		blockDamage = plugin.getConfig().getBoolean("do-zombie-block-damage", true);
+		nonPlayerEntityDamage = plugin.getConfig().getBoolean("do-non-player-damage", true);
 		doBossBar = plugin.getConfig().getBoolean("do-bossbar", true);
 		bossBarFog = plugin.getConfig().getBoolean("bossbar-fog", true);
 		allowSleep = plugin.getConfig().getBoolean("allow-sleep", true);

@@ -8,9 +8,11 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.CreatureSpawner;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
+import org.bukkit.entity.Player;
 import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -20,7 +22,9 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -78,10 +82,16 @@ public class ZombieListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	private void throwerHit(final EntityDamageByEntityEvent event){
 		if (!(event.getDamager() instanceof Zombie)) return;
-		if (!(event.getEntity() instanceof LivingEntity)) return;
 		Zombie zombie = (Zombie) event.getDamager();
 		ZombieType type = ZombieType.getType(zombie);
-		
+
+		if (type == ZombieType.BOOMER
+				&& !plugin.getConfigManager().isNonPlayerEntityDamage()
+				&& !(event.getEntity() instanceof Player)){
+			event.setCancelled(true);
+		}
+
+		if (!(event.getEntity() instanceof LivingEntity)) return;
 		if (type == ZombieType.THROWER){
 			Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
 				Vector newSpeed = event.getDamager().getLocation().getDirection().multiply(1.5).setY(1.5);

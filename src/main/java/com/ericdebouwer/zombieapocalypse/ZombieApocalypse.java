@@ -12,12 +12,14 @@ import com.ericdebouwer.zombieapocalypse.zombie.ZombieItems;
 import com.ericdebouwer.zombieapocalypse.zombie.ZombieListener;
 import lombok.Getter;
 import org.bstats.bukkit.Metrics;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Arrays;
+import java.util.function.Consumer;
 
 @Getter
 public class ZombieApocalypse extends JavaPlugin {
@@ -53,11 +55,11 @@ public class ZombieApocalypse extends JavaPlugin {
 		this.getCommand("zombie").setExecutor(zombieCommand);
 		this.getCommand("zombie").setTabCompleter(zombieCommand);
 
-		if (Arrays.stream(World.class.getDeclaredMethods())
-				.filter(m -> m.getName().equals("spawn"))
-				.anyMatch(m -> Arrays.asList(m.getParameterTypes()).contains(CreatureSpawnEvent.SpawnReason.class))){
+		try {
+			World.class.getMethod("spawn", Location.class, Class.class, CreatureSpawnEvent.SpawnReason.class, Consumer.class);
 			paperMC = true;
 			getLogger().info("PaperMC detected! Changing spawning algorithm accordingly");
+		} catch (NoSuchMethodException ignore) {
 		}
 
 		getServer().getPluginManager().registerEvents(new ZombieListener(this), this);
