@@ -96,7 +96,7 @@ public class ZombieWrapper {
             setProfile.setAccessible(true);
             setProfile.invoke(headMeta, profile);
 
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e1) {
+        } catch (NoSuchMethodError | NoSuchMethodException | IllegalAccessException | InvocationTargetException e1) {
             // this will only happen on new versions, where the proper API can be used
             PlayerProfile profile = Bukkit.createPlayerProfile(UUID.randomUUID());
             PlayerTextures textures = profile.getTextures();
